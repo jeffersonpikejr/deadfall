@@ -16,17 +16,23 @@ A living plan. Phases ship one at a time; each is playable. Dates are ship dates
 - **Inventory management:** per-item **DROP** (items land on the ground, retrievable via ✋/E), and a **SORT** toggle (type → name → count).
 - **Luggage:** equippable bags (Fanny Pack +2, School Backpack +5, Duffel +8) in a dedicated bag slot that raise carry capacity from the base 12. Found in closets; you start with a fanny pack.
 
+## ✅ Phase 3 — Barricading & safehouses (2026-07-11)
+- **Planks** material — found in hardware/tool loot and **salvaged by breaking down looted furniture** (🔨 / `Q`).
+- **Barricade** doors & windows: spend planks to nail on boards (up to 5), sharply raising the HP zombies must chew through. **Carpentry** (previously an unused skill) makes each board tougher and levels with use. **Tear down** your own boards (via ✋/E) to recover planks and reopen.
+- **Claim a safehouse**: designate a cleared building as yours — it gets a **persistent stash** (deposit/withdraw beyond your backpack, accessed from the bag while inside) and is your save anchor. Permadeath preserved (no respawn).
+- Contextual 🔨 build button on mobile; `Q` on desktop.
+
 ---
 
-## 🔜 Phase 3 — candidate directions (pick one to focus)
-
-**A. Barricading & safehouses** — nail furniture across doors/windows (uses the Carpentry skill, which already exists but does little); claim a building as a respawn/stash point; zombies siege weak points. Deepens the "hole up vs. move" tension.
+## 🔜 Phase 4 — candidate directions (pick one to focus)
 
 **B. Crafting & scavenging economy** — break down junk into components; craft bandages, molotovs, spears, reinforced weapons at a workbench; weapon repair. Gives loot a second life and rewards the skill system.
 
 **C. Objectives & narrative spine** — a reason to push into Downtown: find the radio, reach the evac point, survive N nights. Optional story beats/notes in buildings. Turns the sandbox into a run with an arc and an ending you play toward.
 
 **D. Living town / factions** — other survivors (trade, recruit, or rob), rival scavengers, dynamic events (a horde migrates, a building burns). Makes the town feel inhabited.
+
+**E. Safehouse depth** — respawn-at-safehouse mode, tool/nail requirements for barricades, fast-travel between claimed buildings, zombie siege events that target your weak points.
 
 ## 🧊 Backlog / smaller polish
 - Vehicles (risk/reward: fast + very loud).

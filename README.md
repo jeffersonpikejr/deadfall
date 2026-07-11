@@ -14,14 +14,15 @@ The game **auto-detects your device** and swaps controls + UI to match. It also 
 | `W` `A` `S` `D` / arrows | Move |
 | Mouse | Aim (twin-stick — you face the cursor) |
 | Left click / `Space` | Attack / fire (hold to keep swinging) |
-| `E` / right click | Loot · pick up dropped items · doors · windows |
+| `E` / right click | Loot · pick up items · doors · windows · tear down boards |
+| `Q` | Build — barricade a door/window · salvage furniture · claim safehouse |
 | `Shift` | Sprint (loud — draws the horde) |
-| `Tab` / `I` / `B` | Backpack — equip · drop · sort · armor · bags · skills |
+| `Tab` / `I` / `B` | Backpack — equip · drop · sort · stash · armor · bags · skills |
 | `M` | Full map |
 | `Esc` | Close bag / map |
 
 ### 📱 Mobile (touch)
-Left thumb drives a floating virtual stick; the right-hand pad holds **✊ Attack · ✋ Interact · 🏃 Sprint · 🎒 Bag**. Tap the minimap for the full map. Played in **landscape** — a rotate prompt appears in portrait.
+Left thumb drives a floating virtual stick; the right-hand pad holds **✊ Attack · ✋ Interact · 🏃 Sprint · 🎒 Bag**, plus a **🔨 Build** button that appears when you're next to something you can barricade, salvage, or claim. Tap the minimap for the full map. Played in **landscape** — a rotate prompt appears in portrait.
 
 ## Gameplay notes
 
@@ -30,6 +31,7 @@ Left thumb drives a floating virtual stick; the right-hand pad holds **✊ Attac
 - New horrors walk after dark: screamers that call the horde, gas-filled bloaters, night stalkers.
 - **Nightfall is dark.** A flashlight throws a **cone of light** wherever you aim — everything outside it stays black. Batteries keep it alive.
 - **Manage your pack.** Every item can be dropped to the ground (and picked back up); **SORT** tidies the bag by type, name, or count. Find bigger **bags** (fanny pack → backpack → duffel) to raise your carry capacity.
+- **Fortify.** Break down furniture into **planks**, nail them across doors and windows to slow the horde (your **Carpentry** skill makes boards tougher), and **claim a building as a safehouse** with a persistent stash for the gear you can't carry.
 - Rain masks your footsteps. Skills (Blunt, Blade, Aiming, Fitness, Carpentry, First Aid) grow with use.
 - Manage health, satiation, hydration, and stamina. Bleeding, fractures, and infection will end you as surely as a bite.
 - Your run auto-saves; **Continue** resumes it from the menu. See [ROADMAP.md](ROADMAP.md) for what's next.
