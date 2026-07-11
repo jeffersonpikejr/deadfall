@@ -14,9 +14,9 @@ The game **auto-detects your device** and swaps controls + UI to match. It also 
 | `W` `A` `S` `D` / arrows | Move |
 | Mouse | Aim (twin-stick — you face the cursor) |
 | Left click / `Space` | Attack / fire (hold to keep swinging) |
-| `E` / right click | Loot · open & close doors · climb windows |
+| `E` / right click | Loot · pick up dropped items · doors · windows |
 | `Shift` | Sprint (loud — draws the horde) |
-| `Tab` / `I` / `B` | Backpack — armor · throwables · skills |
+| `Tab` / `I` / `B` | Backpack — equip · drop · sort · armor · bags · skills |
 | `M` | Full map |
 | `Esc` | Close bag / map |
 
@@ -28,9 +28,11 @@ Left thumb drives a floating virtual stick; the right-hand pad holds **✊ Attac
 - **Seeded worlds** — enter a seed on the menu to replay the same town, or leave it blank for random.
 - Districts (Downtown, Suburbs, Industrial, Rural) hide different loot. The police armory is always out there somewhere.
 - New horrors walk after dark: screamers that call the horde, gas-filled bloaters, night stalkers.
+- **Nightfall is dark.** A flashlight throws a **cone of light** wherever you aim — everything outside it stays black. Batteries keep it alive.
+- **Manage your pack.** Every item can be dropped to the ground (and picked back up); **SORT** tidies the bag by type, name, or count. Find bigger **bags** (fanny pack → backpack → duffel) to raise your carry capacity.
 - Rain masks your footsteps. Skills (Blunt, Blade, Aiming, Fitness, Carpentry, First Aid) grow with use.
 - Manage health, satiation, hydration, and stamina. Bleeding, fractures, and infection will end you as surely as a bite.
-- Your run auto-saves; **Continue** resumes it from the menu.
+- Your run auto-saves; **Continue** resumes it from the menu. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## Tech
 
