@@ -71,6 +71,8 @@
   .item .act.drop:active { background:rgba(90,40,30,.5); }
   .item .act.stash { background:rgba(40,60,80,.5); border-color:rgba(120,160,200,.5); color:#cddcea; padding:8px 11px; }
   .item .act.stash:active { background:rgba(60,90,120,.6); }
+  #restBtn { width:100%; margin:10px 0 4px; padding:12px; background:rgba(40,50,70,.55); border:1px solid rgba(140,170,210,.5); color:#dbe6f2; font-family:inherit; letter-spacing:2px; font-size:13px; border-radius:3px; }
+  #restBtn:active { background:rgba(60,80,110,.7); }
   .item.equipped { background:rgba(120,100,40,.12); }
   .durbar { height:4px; background:rgba(0,0,0,.6); margin-top:4px; width:120px; }
   .durbar i { display:block; height:100%; background:#7a8f3d; }
@@ -110,6 +112,7 @@
   #hurt { position:fixed; inset:0; pointer-events:none; z-index:4; background:radial-gradient(ellipse at center, transparent 40%, rgba(150,20,15,.55) 100%); opacity:0; transition:opacity .12s; }
   #fever { position:fixed; inset:0; pointer-events:none; z-index:4; background:radial-gradient(ellipse at center, transparent 45%, rgba(70,120,40,.4) 100%); opacity:0; }
   #paused { position:fixed; top:calc(14px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:11; color:#8a8272; letter-spacing:4px; font-size:12px; display:none; }
+  #siegeBanner { position:fixed; top:calc(40px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:8; color:#e85a4a; letter-spacing:4px; font-size:13px; font-weight:bold; text-shadow:0 1px 3px #000; display:none; pointer-events:none; animation:pulse 1s infinite; }
 
   /* ---------- Minimap ---------- */
   #mini { position:fixed; top:calc(10px + env(safe-area-inset-top)); right:calc(10px + env(safe-area-inset-right)); width:88px; height:88px; z-index:7; border:2px solid rgba(200,190,160,.3); background:rgba(6,8,10,.6); pointer-events:auto; image-rendering:pixelated; image-rendering:crisp-edges; box-shadow:0 2px 8px rgba(0,0,0,.5); }
@@ -131,6 +134,8 @@
   #rerollBtn:active { background:rgba(120,40,30,.5); }
   .ghost { margin-top:14px; padding:11px 24px; background:transparent; border:1px solid rgba(200,190,160,.25); color:#8a8272; font-family:inherit; font-size:12px; letter-spacing:2px; }
   .ghost:active { color:#d8d2bd; border-color:rgba(200,190,160,.5); }
+  #respawnToggle { margin-top:16px; }
+  #respawnToggle.on { color:#d8c98a; border-color:rgba(230,200,110,.6); background:rgba(110,90,30,.2); }
 
   /* ---------- Landscape gate ---------- */
   #rotate { position:fixed; inset:0; z-index:60; background:#08080a; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; }
@@ -205,6 +210,7 @@
   <button id="bagClose">CLOSE</button>
 </div>
 <div id="paused">— PAUSED —</div>
+<div id="siegeBanner">⚠ UNDER SIEGE ⚠</div>
 <canvas id="mini" width="176" height="176"></canvas>
 
 <div id="mapScreen">
@@ -224,10 +230,11 @@
     <input id="seedInput" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="random">
     <button id="rerollBtn" type="button" aria-label="random seed">⟳</button>
   </div>
+  <button id="respawnToggle" type="button" class="ghost">SAFEHOUSE RESPAWN: OFF</button>
   <div class="ctrl">
     <div class="hint-touch">LEFT THUMB — MOVE &nbsp;·&nbsp; ✊ ATTACK &nbsp;·&nbsp; ✋ LOOT / DOORS / CLIMB WINDOWS<br>🏃 SPRINT (LOUD) &nbsp;·&nbsp; 🔨 BARRICADE / SALVAGE / CLAIM &nbsp;·&nbsp; 🎒 BAG</div>
     <div class="hint-desktop"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> MOVE &nbsp;·&nbsp; MOUSE AIM &nbsp;·&nbsp; <kbd>CLICK</kbd> ATTACK &nbsp;·&nbsp; <kbd>E</kbd> / RIGHT-CLICK LOOT · DOORS · WINDOWS<br><kbd>SHIFT</kbd> SPRINT &nbsp;·&nbsp; <kbd>Q</kbd> BARRICADE / SALVAGE / CLAIM &nbsp;·&nbsp; <kbd>TAB</kbd> BAG &nbsp;·&nbsp; <kbd>M</kbd> MAP &nbsp;·&nbsp; <kbd>ESC</kbd> CLOSE</div>
-    <br>New horrors walk after dark: screamers that call the horde, gas-filled bloaters, night stalkers.<br>Board up a building, claim it as a safehouse, and stash your gear. Skills grow with use.</div>
+    <br>New horrors walk after dark: screamers that call the horde, gas-filled bloaters, night stalkers.<br>Claim a safehouse, board up the walls, and rest through the night — but the horde will come for it.</div>
 </div>
 
 <div class="screen" id="dead">
@@ -432,6 +439,8 @@ let dirtyTiles=new Map(), explored=null, waypoint=null;   // runtime tile edits,
 let flares=[], fires=[], clouds=[];                       // thrown decoys / fire fields / toxin clouds
 let groundItems=[];                                       // items dropped on the ground (retrievable)
 let safehouse=null, stash=[];                             // claimed building rect + its persistent storage
+let siegeArmed=true, siegeActive=false;                   // one horde assault per night when you hole up
+let respawnMode=false;                                    // opt-in: wake at safehouse on death (drops carried gear)
 const MAX_BARRICADE=5;                                    // boards per door/window
 const PLANK_HP=6;                                         // door/window HP added per plank (+carpentry level)
 let weather='clear', weatherT=0, weatherStrength=0;        // clear | rain | fog
@@ -769,7 +778,7 @@ function newRun(){
   spawnInitialZombies();              // initial horde layout is part of the seed
   curRng = Math.random;               // ---- gameplay is non-deterministic ----
   explored = new Uint8Array(MW*MH);
-  dirtyTiles = new Map(); flares=[]; fires=[]; clouds=[]; groundItems=[]; bagSort=null; safehouse=null; stash=[];
+  dirtyTiles = new Map(); flares=[]; fires=[]; clouds=[]; groundItems=[]; bagSort=null; safehouse=null; stash=[]; siegeArmed=true; siegeActive=false;
   weather='clear'; weatherStrength=0; weatherT=R(50,120); curDistrict='';
   corpses=[]; decals=[]; noises=[]; tracers=[]; swing=null; muzzleT=0; shake=0;
   gameMin=8*60; day=1; kills=0; spawnT=14; hordeArmed=true; hintI=0; hintT=1.2; beatT=0; groanT=R(4,9);
@@ -997,6 +1006,25 @@ function unstashItem(i){
   if(P.inv.length>=invCap()){ msg('Backpack is full.','#c96'); return; }
   P.inv.push({id:row.id, q:row.q, dur:row.dur, cond:row.cond});
   stash.splice(i,1); SFX.pick(); syncBag();
+}
+// Rest in your safehouse to pass the hours and recover — but a siege can jolt you awake.
+function restUntilDawn(){
+  if(!isInSafehouse()){ msg('You can only rest in a claimed safehouse.','#998'); return; }
+  if(zombies.some(z=>z.state==='chase' && dist2(z.x,z.y,P.x,P.y)<(9*TS)*(9*TS))){ msg('Too dangerous to rest — they are right outside.','#c96'); return; }
+  let hours=0, interrupted=false;
+  while(hours<14){
+    gameMin+=60; if(gameMin>=1440){ gameMin-=1440; day++; hordeArmed=true; }
+    hours++;
+    if(siegeArmed && safehouse && darkness()>.75){ interrupted=true; break; }   // a siege is about to hit
+    P.hp=clamp(P.hp+7,0,100); P.sta=100;
+    P.sat=clamp(P.sat-4,0,100); P.hyd=clamp(P.hyd-5,0,100);
+    if(P.sat<=0||P.hyd<=0){ break; }                       // wake hungry / parched
+    if(darkness()<.35){ break; }                           // slept through to daylight
+  }
+  if(paused) toggleBag();
+  if(interrupted) msg('You jolt awake — something is at the walls.','#e55');
+  else msg(`You rest for ${hours} hour${hours!==1?'s':''}.`, (P.sat<=0||P.hyd<=0)?'#c96':'#bd9');
+  syncHUD();
 }
 
 function throwItem(i){
@@ -1512,6 +1540,25 @@ function updateSpawns(dt){
     SFX.groan(); setTimeout(()=>SFX.groan(),400); setTimeout(()=>SFX.groan(),900);
   }
   if(h>=21) hordeArmed=false;
+
+  // ---- safehouse siege: the horde comes for your walls when you hole up at night ----
+  if(darkness()<.3) siegeArmed=true;                       // re-arm each morning
+  if(siegeArmed && !siegeActive && safehouse && isInSafehouse() && darkness()>.75){
+    siegeArmed=false; siegeActive=true;
+    const sc={x:(safehouse.x+safehouse.w/2)*TS, y:(safehouse.y+safehouse.h/2)*TS};
+    const wave = clamp(9+day*3, 9, 40);                    // grows as the days drag on
+    for(let i=0;i<wave;i++){
+      const z=spawnEdge();
+      if(z){ z.state='invest'; z.tx=sc.x+R(-3*TS,3*TS); z.ty=sc.y+R(-3*TS,3*TS); }
+    }
+    shake=Math.max(shake,6);
+    msg('THEY FOUND YOU. The horde is coming for the walls — hold the line.','#e55');
+    SFX.scream(); setTimeout(()=>SFX.groan(),500); setTimeout(()=>SFX.groan(),1000);
+  }
+  if(siegeActive && darkness()<.35){                       // dawn breaks the assault
+    siegeActive=false; addSkill('carpentry',6);
+    msg('Dawn. The assault breaks against your walls. You held.','#bd9');
+  }
 }
 function spawnEdge(forceSide){
   const side=forceSide!==undefined?forceSide:RI(0,3);
@@ -1621,6 +1668,20 @@ function updatePlayer(dt){
 }
 function die(cause){
   if(state!=='play') return;
+  // opt-in respawn: wake at your safehouse, but everything you were carrying drops where you fell
+  if(respawnMode && safehouse){
+    const dx=P.x, dy=P.y;
+    if(P.weapon){ groundItems.push({x:dx,y:dy,id:P.weapon.id,q:1,dur:P.weapon.dur}); P.weapon=null; }
+    for(const r of P.inv) groundItems.push({x:dx+R(-12,12),y:dy+R(-12,12),id:r.id,q:r.q,dur:r.dur,cond:r.cond});
+    P.inv=[];                                    // pack lost to the death-cache; worn armor + bag + skills + stash stay
+    P.x=(safehouse.x+safehouse.w/2)*TS; P.y=(safehouse.y+safehouse.h/2)*TS;
+    P.hp=40; P.sat=Math.max(P.sat,25); P.hyd=Math.max(P.hyd,25);
+    P.bleeding=false; P.infected=false; P.contam=0; P.fracture=0;
+    SFX.hurt(); shake=Math.max(shake,9);
+    msg(`You should have died of ${cause}… but you wake in your safehouse. Your pack is where you fell — go get it.`,'#e55');
+    syncBag(); syncAtkGlyph(); saveGame();
+    return;
+  }
   state='dead';
   clearSave();
   const totalH = Math.max(0, Math.floor(((day-1)*1440 + gameMin - 480)/60));
@@ -1906,6 +1967,7 @@ function syncHUD(){
   document.getElementById('satF').style.width = P.sat+'%';
   document.getElementById('hydF').style.width = P.hyd+'%';
   document.getElementById('staF').style.width = P.sta+'%';
+  document.getElementById('siegeBanner').style.display = siegeActive ? 'block' : 'none';
   const h=Math.floor((gameMin/60)%24), mn=Math.floor(gameMin%60);
   document.getElementById('dayTxt').textContent='Day '+day;
   document.getElementById('timeTxt').textContent=String(h).padStart(2,'0')+':'+String(mn).padStart(2,'0');
@@ -2004,8 +2066,12 @@ function syncBag(){
       stBtn.addEventListener('touchstart',e=>{e.preventDefault();stashItem(i);},{passive:false}); }
     list.appendChild(row);
   });
-  // safehouse stash (only shown while standing in your claimed building)
+  // safehouse: rest + stash (only while standing in your claimed building)
   if(inSafe){
+    const restBtn=document.createElement('button'); restBtn.id='restBtn'; restBtn.textContent='😴 REST UNTIL DAWN';
+    restBtn.addEventListener('click',restUntilDawn);
+    restBtn.addEventListener('touchstart',e=>{e.preventDefault();restUntilDawn();},{passive:false});
+    list.appendChild(restBtn);
     const sh2=document.createElement('div'); sh2.className='skillHdr'; sh2.textContent=`🏠 SAFEHOUSE STASH — ${stash.length} stored`; list.appendChild(sh2);
     if(!stash.length){ const e=document.createElement('div'); e.className='item'; e.innerHTML='<div class="inm" style="color:#6d675a">Empty. Tap STASH on an item to store it here — it survives outside your pack.</div>'; list.appendChild(e); }
     stash.forEach((r,i)=>{
@@ -2140,7 +2206,7 @@ function serialize(){
     fracture:P.fracture, fractureT:P.fractureT, contam:P.contam, contamP:P.contamP, contamKind:P.contamKind, flashBatt:P.flashBatt,
     weather, weatherT, weatherStrength,
     doorsOpen:[...doorOpen], doorHp:[...doorHp], tiles:[...dirtyTiles],
-    barricades:[...barricades], safehouse, stash,
+    barricades:[...barricades], safehouse, stash, respawnMode, siegeArmed,
     looted, explored:packExplored(),
   };
 }
@@ -2177,6 +2243,7 @@ function applySave(s){
   explored=unpackExplored(s.explored);
   corpses=[]; decals=[]; noises=[]; tracers=[]; swing=null; muzzleT=0; shake=0; flares=[]; fires=[]; clouds=[]; groundItems=s.ground||[]; bagSort=null;
   safehouse=s.safehouse||null; stash=s.stash||[];
+  respawnMode=!!s.respawnMode; siegeArmed=(s.siegeArmed!=null?!!s.siegeArmed:true); siegeActive=false;
   spawnT=14; hintT=9; beatT=0; groanT=R(4,9); waypoint=null; miniDirty=true;
   spawnInitialZombies();              // fresh horde (curRng = Math.random)
   syncBag();
@@ -2276,8 +2343,9 @@ function showMenu(){
 async function refreshMenu(){
   savedGame = await loadSaveMeta();
   const c=document.getElementById('continueBtn');
-  if(savedGame){ c.style.display='block'; document.getElementById('contInfo').textContent='DAY '+savedGame.day+' · '+savedGame.kills+' KILLED'; }
+  if(savedGame){ c.style.display='block'; document.getElementById('contInfo').textContent='DAY '+savedGame.day+' · '+savedGame.kills+' KILLED'; if(savedGame.respawnMode!=null) respawnMode=!!savedGame.respawnMode; }
   else c.style.display='none';
+  if(typeof updateRespawnToggle==='function') updateRespawnToggle();
 }
 function seedFromInput(){
   const raw=((document.getElementById('seedInput')||{}).value||'').trim();
@@ -2309,6 +2377,10 @@ tapBtn('continueBtn', continueGame);
 tapBtn('retryBtn', ()=>{ const si=document.getElementById('seedInput'); if(si) si.value=''; startGame(); });
 tapBtn('menuBtn', showMenu);
 document.getElementById('rerollBtn').addEventListener('click',()=>{ const si=document.getElementById('seedInput'); if(si) si.value=String((Math.random()*4294967296)>>>0); });
+const respawnToggleEl=document.getElementById('respawnToggle');
+function updateRespawnToggle(){ respawnToggleEl.textContent='SAFEHOUSE RESPAWN: '+(respawnMode?'ON':'OFF'); respawnToggleEl.classList.toggle('on', respawnMode); }
+respawnToggleEl.addEventListener('click',()=>{ respawnMode=!respawnMode; updateRespawnToggle(); });
+updateRespawnToggle();
 miniEl.addEventListener('touchstart',e=>{ e.preventDefault(); audio(); openMap(); },{passive:false});
 miniEl.addEventListener('click',()=>{ audio(); openMap(); });
 const mapScreenEl=document.getElementById('mapScreen');

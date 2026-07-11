@@ -32,6 +32,7 @@ Left thumb drives a floating virtual stick; the right-hand pad holds **✊ Attac
 - **Nightfall is dark.** A flashlight throws a **cone of light** wherever you aim — everything outside it stays black. Batteries keep it alive.
 - **Manage your pack.** Every item can be dropped to the ground (and picked back up); **SORT** tidies the bag by type, name, or count. Find bigger **bags** (fanny pack → backpack → duffel) to raise your carry capacity.
 - **Fortify.** Break down furniture into **planks**, nail them across doors and windows to slow the horde (your **Carpentry** skill makes boards tougher), and **claim a building as a safehouse** with a persistent stash for the gear you can't carry.
+- **Hold the line.** **Rest** in your safehouse to pass the night and recover — but hole up and the horde will **lay siege** to your walls. Survive till dawn. Optional **safehouse respawn** (a New Game toggle, off by default) lets you wake at your safehouse on death, dropping your pack as a recoverable cache — permadeath stays the default.
 - Rain masks your footsteps. Skills (Blunt, Blade, Aiming, Fitness, Carpentry, First Aid) grow with use.
 - Manage health, satiation, hydration, and stamina. Bleeding, fractures, and infection will end you as surely as a bite.
 - Your run auto-saves; **Continue** resumes it from the menu. See [ROADMAP.md](ROADMAP.md) for what's next.

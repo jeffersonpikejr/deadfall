@@ -22,9 +22,14 @@ A living plan. Phases ship one at a time; each is playable. Dates are ship dates
 - **Claim a safehouse**: designate a cleared building as yours — it gets a **persistent stash** (deposit/withdraw beyond your backpack, accessed from the bag while inside) and is your save anchor. Permadeath preserved (no respawn).
 - Contextual 🔨 build button on mobile; `Q` on desktop.
 
+## ✅ Phase 4 — Under Siege (deeper safehouses, 2026-07-11)
+- **Siege events** — when you hole up in your safehouse at night, the horde converges on it and assaults your barricades (wave scales with the day count). An **⚠ UNDER SIEGE ⚠** banner flags it; dawn breaks the assault and rewards Carpentry. The payoff loop for barricading.
+- **Rest** — a **REST UNTIL DAWN** action in the safehouse bag passes the hours, healing HP and stamina while draining food/water — but a siege jolts you awake mid-rest.
+- **Opt-in respawn** — a **New Game toggle** (default OFF, preserving permadeath). When on, dying at a claimed safehouse wakes you there with 40 HP; everything you were carrying drops as a recoverable death-cache where you fell (a corpse run). No safehouse = death is still final.
+
 ---
 
-## 🔜 Phase 4 — candidate directions (pick one to focus)
+## 🔜 Phase 5 — candidate directions (pick one to focus)
 
 **B. Crafting & scavenging economy** — break down junk into components; craft bandages, molotovs, spears, reinforced weapons at a workbench; weapon repair. Gives loot a second life and rewards the skill system.
 
@@ -32,7 +37,7 @@ A living plan. Phases ship one at a time; each is playable. Dates are ship dates
 
 **D. Living town / factions** — other survivors (trade, recruit, or rob), rival scavengers, dynamic events (a horde migrates, a building burns). Makes the town feel inhabited.
 
-**E. Safehouse depth** — respawn-at-safehouse mode, tool/nail requirements for barricades, fast-travel between claimed buildings, zombie siege events that target your weak points.
+**E2. Safehouse network** — the deferred half of "deeper safehouses": claim **multiple** safehouses and **fast-travel** between them when the coast is clear; tool/nail requirements for barricades; siege events that specifically probe your weakest wall.
 
 ## 🧊 Backlog / smaller polish
 - Vehicles (risk/reward: fast + very loud).
