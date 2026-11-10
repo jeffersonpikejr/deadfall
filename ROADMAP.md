@@ -29,23 +29,38 @@ A living plan. Phases ship one at a time; each is playable. Dates are ship dates
 
 ---
 
-## 🔜 Phase 5 — candidate directions (pick one to focus)
+## ✅ Phase 5 — The Overhaul: a roguelite with a way out (2026-11-10)
+Ships the old candidates **B (crafting)** and **C (objectives & narrative)**, plus most of the backlog, on a rebuilt world and renderer.
 
-**B. Crafting & scavenging economy** — break down junk into components; craft bandages, molotovs, spears, reinforced weapons at a workbench; weapon repair. Gives loot a second life and rewards the skill system.
-
-**C. Objectives & narrative spine** — a reason to push into Downtown: find the radio, reach the evac point, survive N nights. Optional story beats/notes in buildings. Turns the sandbox into a run with an arc and an ending you play toward.
-
-**D. Living town / factions** — other survivors (trade, recruit, or rob), rival scavengers, dynamic events (a horde migrates, a building burns). Makes the town feel inhabited.
-
-**E2. Safehouse network** — the deferred half of "deeper safehouses": claim **multiple** safehouses and **fast-travel** between them when the coast is clear; tool/nail requirements for barricades; siege events that specifically probe your weakest wall.
-
-## 🧊 Backlog / smaller polish
-- Vehicles (risk/reward: fast + very loud).
-- Weather-driven events (storms that mask sound but hurt visibility).
-- Difficulty / permadeath modes; run stats & a death screen leaderboard.
-- Audio settings + a mute toggle; controller support.
-- Save slots and multiple concurrent seeds.
+- **Controls** — dodge roll with invulnerability frames (`Space` / 💨 / `B`), hold-to-attack, two weapon slots with swap, reloads, quick-heal, throw-to-cursor, flashlight toggle, a desktop hotbar; on touch the attack button doubles as an aim stick (with auto-facing when you don't aim) plus a quick-action row; **full gamepad support** including menus; a pause menu with volume / screen-shake / damage-number settings; a smoothed look-ahead camera that zooms in on large screens.
+- **Graphics** — the town is painted into cached tile chunks (textured ground, brick/siding/metal walls, 25 kinds of furniture, per-table containers, vehicles, fixtures); animated procedural sprites for the player and every infected type; **ray-cast line of sight** (you see only what you could see, light stops at walls, rooms stay hidden until opened); coloured light from the flashlight, fires, flares, streetlights and muzzle flash; particles, hit-stop, damage numbers, swing trails, dusk/dawn grading, storms with lightning.
+- **Procedural generation** — a jittered-BSP street grid inside a ring road, optional river and bridges, districts by distance and noise, landmark compounds, lots, and multi-room furnished interiors; a connectivity pass that guarantees every building and story item is reachable. Map grew to 128×128.
+- **Roguelike story** — ten origins; three seeded escape routes (**The Signal / The Long Road / The Line**) built on a shared objective chain with hold-out finales; five lore threads whose last page reveals a hidden cache; a journal and a per-run chronicle; win and death screens with score, epitaph and unlocks.
+- **Loot** — five quality tiers, 17 affixes, 10 legendary uniques, tiered containers, locks (lockpick / crowbar / sledge), search time, car trunks (and alarms), zombie drops, supply airdrops; 16 melee weapons and 6 firearms with their own ammunition.
+- **Crafting** — eight materials, 17 recipes (some bench-only), weapon and armor repair, spike traps, pipe bombs, noisemakers; four safehouse stations.
+- **Progression** — character levels with a 1-of-3 perk draft (23 perks), escalating threat by day (tougher dead, elite modifiers, new types, the power failing, the hunting Alpha), and meta-progression that unlocks origins across runs.
+- **AI** — a shared flow field: hunters path around walls, pick an opening and break it; brutes charge, spitters shoot, the Alpha rallies.
+- Also: broken doors/windows can be re-boarded, containers keep what your pack can't hold, storms, a waypoint map, safehouse claim from the pack. **Save schema is now v4 — earlier saves are not carried over.**
 
 ---
 
-_Steering: tell me which Phase 3 letter (or backlog item) to build next, and I'll spec + implement it as the next phase._
+## 🔜 Phase 6 — candidate directions (pick one to focus)
+
+**D. Living town / factions** — other survivors (trade, recruit, or rob), a wandering trader, rival scavengers who strip buildings before you, dynamic events (a horde migrates, a building burns). The largest remaining gap: the town is still empty of people.
+
+**E2. Safehouse network** — claim **multiple** safehouses and **fast-travel** between them when the coast is clear; sieges that probe your weakest wall; more stations (garden, radio, watch post).
+
+**F. More ways out** — a fourth and fifth route (the river and a boat; the hospital roof), route-specific bosses, and branching objectives so two runs on the same route still differ.
+
+**G. Run modifiers & daily seed** — optional mutators (permanent night, no guns, fast dead), difficulty tiers, a daily seed with a local leaderboard.
+
+## 🧊 Backlog / smaller polish
+- Vehicles (risk/reward: fast + very loud).
+- Save slots and multiple concurrent seeds.
+- Key rebinding; a colour-blind-friendly rarity palette.
+- A proper on-screen tutorial for the first run instead of timed hints.
+- Hand-tuning pass on balance (loot rates, XP curve, hold-out wave sizes) from real play data.
+
+---
+
+_Steering: tell me which Phase 6 letter (or backlog item) to build next, and I'll spec + implement it as the next phase._
