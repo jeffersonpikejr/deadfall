@@ -35,6 +35,7 @@
   #obj .ot { color:#e6c86e; letter-spacing:1px; }
   #obj .os { color:#a89f8a; font-size:10.5px; }
   #obj .oh { color:#e85a4a; font-weight:bold; letter-spacing:1px; }
+  #obj .of { color:#9cd0e6; font-size:10.5px; margin-top:2px; }
 
   #clock { position:absolute; top:calc(10px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); text-align:center; font-size:13px; letter-spacing:1px; text-shadow:0 1px 2px #000; }
   #clock .day { font-size:15px; font-weight:bold; color:#d8d2bd; }
@@ -169,6 +170,26 @@
   #noteBody { max-width:480px; margin-top:16px; padding:22px 20px; background:#d9d0b8; color:#2a251e; font-size:13.5px; line-height:1.75; text-align:left; border-radius:2px; box-shadow:0 6px 30px rgba(0,0,0,.7); white-space:pre-wrap; transform:rotate(-.6deg); }
   #noteTitle { color:#d8d2bd; letter-spacing:3px; font-size:13px; }
   #pauseScreen { z-index:16; }
+  #talkScreen, #tradeScreen { z-index:15; }
+  #talkName { font-size:clamp(16px,4vw,22px); letter-spacing:5px; color:#9cd0e6; }
+  #talkPerk { margin-top:6px; max-width:460px; color:#6d675a; font-size:11px; line-height:1.5; }
+  #talkText { max-width:480px; margin-top:14px; padding:14px 18px; border-left:2px solid rgba(140,200,230,.5); background:rgba(20,26,30,.7); color:#d8d2bd; font-size:13.5px; line-height:1.7; text-align:left; white-space:pre-wrap; }
+  #talkOpts { display:flex; flex-direction:column; align-items:center; }
+  #talkOpts .ghost { margin-top:10px; min-width:260px; }
+  #talkOpts .ghost:disabled { opacity:.45; }
+  #tradeScreen { align-items:stretch; overflow:hidden; text-align:left; padding:calc(14px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+  #tradeHdr { display:flex; align-items:center; gap:14px; border-bottom:1px solid rgba(200,190,160,.3); padding-bottom:8px; }
+  #tradeHdr .tt { flex:1; letter-spacing:4px; color:#e6c86e; font-size:14px; }
+  #tradeCredit { color:#e8dfc8; letter-spacing:2px; font-size:13px; }
+  #tradeCols { flex:1; display:flex; gap:16px; min-height:0; margin-top:6px; }
+  .tcol { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .tlist { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
+  .modRow { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:900px; }
+  .mchip { padding:7px 11px; font-size:10.5px; letter-spacing:1px; background:transparent; border:1px solid rgba(200,190,160,.25); color:#8a8272; border-radius:14px; }
+  .mchip.on, .mchip.gpf { color:#e8dfc8; border-color:rgba(232,90,74,.8); }
+  .mchip.on { background:rgba(120,40,30,.35); }
+  #modInfo { margin-top:8px; color:#8a8272; font-size:11px; letter-spacing:1px; min-height:14px; max-width:640px; line-height:1.5; }
+  #dailyBtn { margin-top:10px; }
   .prow { margin-top:16px; display:flex; align-items:center; gap:12px; justify-content:center; font-size:12px; letter-spacing:2px; color:#a89f8a; }
   .prow input[type=range] { width:160px; accent-color:#b8302a; }
   .ghost { margin-top:14px; padding:11px 24px; background:transparent; border:1px solid rgba(200,190,160,.25); color:#8a8272; font-size:12px; letter-spacing:2px; }
@@ -352,6 +373,22 @@
   <button class="ghost" id="noteClose">CLOSE</button>
 </div></div>
 
+<div class="overlay scroll" id="talkScreen"><div class="inner">
+  <div id="talkName"></div>
+  <div class="sub" id="talkRole"></div>
+  <div id="talkPerk"></div>
+  <div id="talkText"></div>
+  <div id="talkOpts"></div>
+</div></div>
+
+<div class="overlay" id="tradeScreen">
+  <div id="tradeHdr"><span class="tt">THE PEDDLER</span><span id="tradeCredit"></span><button class="ghost" id="tradeClose" style="margin:0;padding:8px 16px">CLOSE</button></div>
+  <div id="tradeCols">
+    <div class="tcol"><div class="secHdr">HE SELLS — stock changes every morning</div><div class="tlist scroll" id="tradeBuy"></div></div>
+    <div class="tcol"><div class="secHdr">YOUR PACK — he buys</div><div class="tlist scroll" id="tradeSell"></div></div>
+  </div>
+</div>
+
 <div class="overlay scroll" id="pauseScreen"><div class="inner">
   <h2>PAUSED</h2>
   <div class="sub" id="pauseSeed"></div>
@@ -374,6 +411,7 @@
     <button id="rerollBtn" type="button" aria-label="random seed">⟳</button>
   </div>
   <button id="respawnToggle" type="button" class="ghost">SAFEHOUSE RESPAWN: OFF</button>
+  <button id="dailyBtn" type="button" class="ghost">DAILY RUN</button>
   <div id="metaLine"></div>
   <div class="ctrl">
     <div class="hint-touch">LEFT THUMB — MOVE &nbsp;·&nbsp; ✊ ATTACK (DRAG TO AIM) &nbsp;·&nbsp; 💨 DODGE &nbsp;·&nbsp; ✋ SEARCH / DOORS / WINDOWS<br>🏃 SPRINT (LOUD) &nbsp;·&nbsp; 🔨 BARRICADE / SALVAGE / CLAIM &nbsp;·&nbsp; 🎒 PACK · CRAFT · JOURNAL</div>
@@ -383,8 +421,11 @@
 
 <div class="screen scroll" id="originScreen"><div class="inner">
   <h2>WHO WERE YOU, BEFORE?</h2>
-  <div class="sub">IT DECIDES WHAT YOU WAKE UP WITH</div>
+  <div class="sub" id="originSub">IT DECIDES WHAT YOU WAKE UP WITH</div>
   <div class="cards" id="originCards"></div>
+  <div class="sub" style="margin-top:18px">MAKE IT WORSE — EACH ONE RAISES YOUR SCORE</div>
+  <div class="modRow" id="modRow"></div>
+  <div id="modInfo"></div>
   <button class="ghost" id="originBack">‹ BACK</button>
 </div></div>
 
@@ -662,6 +703,7 @@ const ITEMS = {
   splint:  {n:'Splint', ico:'🩼', t:'med'},
   medkit:  {n:'First Aid Kit', ico:'⛑️', t:'med'},
   antibiotics:{n:'Antibiotics', ico:'💉', t:'med'},
+  stim:    {n:'Adrenaline Shot', ico:'🧪', t:'med'},
   ammo:    {n:'9mm Rounds', ico:'📦', t:'ammo', qty:6},
   shells:  {n:'Shotgun Shells', ico:'🟥', t:'ammo', qty:4},
   rifleammo:{n:'Rifle Rounds', ico:'🟫', t:'ammo', qty:4},
@@ -671,6 +713,7 @@ const ITEMS = {
   lockpick:{n:'Lockpick', ico:'🗝️', t:'tool'},
   repairkit:{n:'Repair Kit', ico:'🧰', t:'tool'},
   patchkit:{n:'Armor Patch Kit', ico:'🧵', t:'tool'},
+  townmap: {n:'Town Map', ico:'🗺️', t:'tool'},
   // melee
   knife:   {n:'Kitchen Knife', ico:'🔪', t:'weapon', cat:'blade', dmg:13, cd:.34, rng:34, arc:1.2, dur:35, spr:'knife'},
   cleaver: {n:'Cleaver', ico:'🔪', t:'weapon', cat:'blade', dmg:18, cd:.42, rng:34, arc:1.3, dur:55, spr:'knife'},
@@ -874,6 +917,8 @@ const PERKS = {
   adren:   {n:'Adrenaline',   ico:'⚡', max:1, d:'Kills restore stamina. Below 30% health you move 15% faster.'},
   second:  {n:'Second Wind',  ico:'🕊️', max:1, d:'Once per day, a killing blow leaves you at 20 health instead.'},
   pyro:    {n:'Firebug',      ico:'🔥', max:1, d:'Your fires burn bigger and longer, and burn you half as much.'},
+  leader:  {n:'Shepherd',     ico:'🫂', max:1, d:'People who follow you hit harder, and two can follow at once.'},
+  haggler: {n:'Silver Tongue',ico:'🗣️', max:1, d:'The Peddler pays more for what you sell and charges less for what you buy.'},
 };
 
 /* ---------- origins (who you were) ---------- */
@@ -889,6 +934,8 @@ const ORIGINS = {
   hunter:     {n:'Hunter',       ico:'🏹', d:'Quiet feet, a quiet bow, patience.', kit:['xbow','bolts','bolts','knife','jerky','water'], perks:{quiet:1}, skills:{aim:2}, lock:'Reach level 6 in one run'},
   firefighter:{n:'Firefighter',  ico:'🚒', d:'You used to run toward it.', kit:['axe','firehelm','water','bandage'], perks:{tough:1}, skills:{blunt:1, blade:1, fitness:1}, lock:'Bring down an Alpha'},
   survivor:   {n:'The One Who Got Out', ico:'🕯️', d:'You escaped a town like this once. You know how it goes.', kit:['machete','daypack','flash','medkit','water','beans','flare','flare'], perks:{second:1, lucky:1}, skills:{fitness:1}, lock:'Escape Deadfall'},
+  dispatcher: {n:'Dispatcher',   ico:'📻', d:'You took the calls that night. You know exactly where people went to ground.', kit:['pistol','ammo','flash','water','bandage'], perks:{leader:1}, skills:{aim:1, firstaid:1}, lock:'Bring 3 survivors home (lifetime)'},
+  smuggler:   {n:'Smuggler',     ico:'🧳', d:'You know a man with a van, and he owes you.', kit:['knife','duffel','lockpick','lockpick','water','jerky'], perks:{haggler:1}, skills:{fitness:1}, lock:'Trade 300 credit with the Peddler (lifetime)'},
 };
 
 /* ---------- the dead ---------- */
@@ -904,6 +951,7 @@ const ZTYPE = {
   stalker: {hp:[46,64],  spd:[58,72], rad:10, dmg:12, xp:10, day:1, night:true, skin:'#3c4450'},
   riot:    {hp:[70,90],  spd:[26,38], rad:11, dmg:11, xp:12, day:1, resist:.7, skin:'#59635c'},
   alpha:   {hp:[620,620],spd:[30,34], rad:19, dmg:22, xp:160,day:9, charge:true, boss:true, skin:'#5a3f3a'},
+  marauder:{hp:[75,95],  spd:[62,72], rad:10, dmg:10, xp:20, day:99,human:true, skin:'#c9a27c'},
 };
 const SHIRTS = ['#4a5a6a','#6a4a4a','#5a5a3a','#3f5548','#6b5b47','#54486a','#7a6a5a','#3d4a5c','#665050','#48605c','#75705a','#4f4f58'];
 // Elite modifiers: roguelike "champions". One per elite, more likely as the days pile up.
@@ -962,6 +1010,7 @@ const EPITAPH={
   'the fire':['You lit it to keep them away. It did not know the difference.'],
   'the gas':['You held your breath for as long as anyone can.'],
   'the Alpha':['It had been hunting you since the first night. It was patient.'],
+  'a marauder':['The dead were never the only thing to be afraid of.','They wanted what you were carrying. Now they have it.'],
   'an explosion':['Loud, bright, and brief. There are worse ways in Deadfall.'],
 };
 
@@ -1796,7 +1845,7 @@ function makeZombie(px,py,forceKind,noElite){
 function spawnInitialZombies(){
   zombies=[];
   let n=0, tries=0;
-  while(n<150 && tries<9000){
+  while(n<(mod('swarm')?215:150) && tries<12000){
     tries++;
     const tx=RI(3,MW-4), ty=RI(3,MH-4), i=idx(tx,ty);
     if(blk[i]&1) continue;
@@ -1821,6 +1870,7 @@ function spawnInitialZombies(){
     }
   }
   spawnStoryZombies();
+  spawnHoldout();
 }
 
 /* ---------- player ---------- */
@@ -1837,7 +1887,7 @@ function freshPlayer(x,y){
     flashBatt:100, flashOn:true, encSpd:1, encStam:0,
     skills:makeSkills(), xp:0, lvl:1, perks:{}, origin:'drifter', swDay:0,
     dodgeT:0, dodgeCd:0, iframe:0, ddx:0, ddy:0, reloadT:0, reloadDur:0, act:null,
-    walkPh:0, swingT:0, recoil:0, vx:0, vy:0,
+    walkPh:0, swingT:0, recoil:0, vx:0, vy:0, stimT:0,
   };
 }
 const SKILL_KEYS=['blunt','blade','aim','fitness','carpentry','firstaid'];
@@ -1854,7 +1904,7 @@ function addSkill(k,amt){
 }
 // character level: kills, discoveries and objectives feed it; every level is a perk draft
 function perk(id){ return (P&&P.perks&&P.perks[id])||0; }
-function maxHp(){ return 100+20*perk('tough'); }
+function maxHp(){ return 100+20*perk('tough')-(mod('frail')?30:0); }
 function xpNeed(l){ return 40+l*30; }
 function gainXP(n){
   if(!P||state!=='play') return;
@@ -1929,7 +1979,7 @@ function idesc(row){
   if(d.t==='food') return `+${d.sat} food`;
   if(d.t==='drink') return `+${d.hyd} water`+(d.sta?` · +${d.sta} stamina`:'');
   if(d.t==='ammo') return 'ammunition';
-  return {antiseptic:'clean a wound',splint:'set a fracture',battery:'recharge the flashlight',bandage:'stop bleeding',pills:'heal over time',medkit:'stop bleeding · heal · clean',antibiotics:'cures the infection',lockpick:'opens locked containers quietly',repairkit:'restore the weapon in hand',patchkit:'restore your most worn armor',flash:'lights the dark (F toggles)'}[row.id]||'';
+  return {antiseptic:'clean a wound',splint:'set a fracture',battery:'recharge the flashlight',bandage:'stop bleeding',pills:'heal over time',medkit:'stop bleeding · heal · clean',antibiotics:'cures the infection',lockpick:'opens locked containers quietly',repairkit:'restore the weapon in hand',patchkit:'restore your most worn armor',flash:'lights the dark (F toggles)',stim:'25 seconds of speed and tireless legs',townmap:'marks every landmark on your map'}[row.id]||'';
 }
 function affixLine(row){
   if(row.u&&UNIQUES[row.u]) return UNIQUES[row.u].d;
@@ -2050,6 +2100,11 @@ function useRow(i){
     for(const sl of ['head','torso','legs']){ const a=P.armor[sl]; if(a){ const r=a.cond/astats(a).condMax; if(r<wr){ wr=r; worst=a; } } }
     if(worst){ const m=astats(worst).condMax; worst.cond=Math.min(m,worst.cond+Math.round(m*.6)); consume(i); SFX.craft(); msg(`🧵 ${iname(worst)} patched.`,'#9c8'); }
     else msg('Nothing you are wearing needs patching.','#998');
+  } else if(id==='stim'){
+    P.stimT=25; P.sta=100; P.exhausted=false; consume(i); SFX.level(); msg('🧪 Your heart slams. For a little while, nothing can catch you.','#9c8');
+  } else if(id==='townmap'){
+    for(const p of pois) if(!p.hidden) p.found=true;
+    consume(i); miniDirty=true; SFX.paper(); msg('🗺️ Every landmark in Deadfall, marked in a careful hand.','#9c8');
   } else if(id==='lockpick'){
     msg('🗝️ Used automatically on locked safes and cabinets.','#998');
   } else if(d.t==='armor'){ equipArmor(i);
@@ -2129,6 +2184,7 @@ function cycleSort(){
 /* ---------- crafting ---------- */
 function nearBench(){
   if(perk('tinker')) return true;
+  if(isInSafehouse()&&hasResident('mechanic')) return true;
   if(safehouse&&safehouse.up&&safehouse.up.bench&&isInSafehouse()) return true;
   const ptx=Math.floor(P.x/TS), pty=Math.floor(P.y/TS);
   for(let dy=-2;dy<=2;dy++) for(let dx=-2;dx<=2;dx++){ if(!inb(ptx+dx,pty+dy)) continue; const f=fixtures.get(idx(ptx+dx,pty+dy)); if(f&&f.kind==='bench') return true; }
@@ -2267,6 +2323,7 @@ function restUntilDawn(){
     hours++;
     if(siegeArmed && safehouse && darkness()>.75){ interrupted=true; break; }   // a siege is about to hit
     P.hp=clamp(P.hp+heal,0,maxHp()); P.sta=100;
+    if(hasResident('medic')){ P.bleeding=false; if(P.fracture===1){ P.fracture=2; P.fractureT=2*1440; } }
     P.sat=clamp(P.sat-4,0,100); P.hyd=clamp(P.hyd-5,0,100);
     if(P.sat<=0||P.hyd<=0) break;                          // wake hungry / parched
     if(darkness()<.35) break;                              // slept through to daylight
@@ -2419,6 +2476,13 @@ function scanInteract(){
     if(d>(TS*1.4)*(TS*1.4)) continue;
     if(d-600<bs){ bs=d-600; best={kind:'ground',gi,label:'PICK UP'}; }
   }
+  for(const n of npcs){   // the living
+    if(n.state==='dead') continue;
+    const d=dist2(P.x,P.y,n.x,n.y);
+    if(d>(TS*1.7)*(TS*1.7)) continue;
+    const sc=n.state==='follow'?d+4000:d-5000;
+    if(sc<bs){ bs=sc; best={kind:'npc',n,label:'TALK'}; }
+  }
   return best;
 }
 function doInteract(){
@@ -2456,7 +2520,7 @@ function doInteract(){
     syncBag();
   } else if(it.kind==='fx'){
     fxInteract(it.i,it.f);
-  }
+  } else if(it.kind==='npc') talkTo(it.n);
 }
 // Searching takes a moment, and you have to stay put. Locks take longer — and tools.
 function startSearch(i,c){
@@ -2481,6 +2545,7 @@ function finishSearch(a){
   c.locked=false;
   if(!c.left){   // first time in: roll quality now, so luck and the day count matter
     c.left=(c.items||[]).map(id=>mkRow(id,c.tier||0,!!c.fixed));
+    if(mod('scarce')&&!c.fixed&&c.table!=='stash') c.left=c.left.filter(()=>Math.random()>.35);
     const sc=perk('scav'), T=LT[c.table];
     if(sc && !c.fixed && T && Math.random()<.3*sc) c.left.push(mkRow(resolveId(pick(T.p)),c.tier||0));
     gainXP(2); run.looted++;
@@ -2661,6 +2726,12 @@ function killZombie(z,o){
   if(z.story) storyZombieKilled(z);
 }
 function zombieDrop(z,S){
+  if(S.human){   // they were carrying what they took
+    if(Math.random()<.6) dropRowAt(mkRow(pick(['pistol','pistol','shotgun','revolver','smg']),2),z.x,z.y);
+    dropRowAt(mkRow(pick(['ammo','ammo','shells']),1),z.x,z.y);
+    dropRowAt(mkRow(pick(['mre','medkit','bandage','water','jerky','pills','stim']),1),z.x,z.y);
+    return;
+  }
   if(S.boss){ dropRowAt(mkUnique(),z.x,z.y); for(let k=0;k<3;k++) dropRowAt(mkRow(pick(ZDROP.elite),3),z.x,z.y); return; }
   if(z.elite){
     dropRowAt(mkRow(pick(ZDROP.elite),2),z.x,z.y);
@@ -2868,7 +2939,10 @@ function updateZombies(dt){
       }
       z.sees=sees;
       if(sees){
-        if(z.state!=='chase' && Math.random()<.4) SFX.groan();
+        if(z.state!=='chase'){
+          if(S.human){ if(performance.now()-_shoutT>9000 && dP2<(16*TS)*(16*TS)){ _shoutT=performance.now(); msg(pick(['"There! Don\'t let them walk out of here!"','"We\'ve got company. Drop them."','"Wrong house, friend."']),'#e88'); } }
+          else if(Math.random()<.4) SFX.groan();
+        }
         z.state='chase'; z.seenT=0; z.tx=P.x; z.ty=P.y;
       }
     }
@@ -2888,6 +2962,7 @@ function updateZombies(dt){
       }
     }
     const dcur=Math.sqrt(dP2), near=dP2<(45*TS)*(45*TS);
+    if(S.human && humanAI(z,dt,dcur,near)) continue;
     // screamer: winds up on sight, then blasts a town-wide alert
     if(z.screamCd>0) z.screamCd-=dt;
     if(S.scream){
@@ -2978,7 +3053,8 @@ function updateZombies(dt){
     }
     // bashing doors / windows / fences when hunting and blocked (windows give way faster)
     const bt = blocked>=0 ? tiles[blocked] : -1;
-    if(blocked>=0 && (z.state==='chase'||z.state==='invest') && ((bt===DR&&!doorOpen.has(blocked)) || bt===WIN || bt===FEN)){
+    if(S.human){ if(bt===DR && !doorOpen.has(blocked) && !(barricades.get(blocked)>0)){ setDoor(blocked,true); if(dP2<(14*TS)*(14*TS)) SFX.door(); } }   // people use the handle
+    else if(blocked>=0 && (z.state==='chase'||z.state==='invest') && ((bt===DR&&!doorOpen.has(blocked)) || bt===WIN || bt===FEN)){
       z.bashT+=dt;
       const rate=(bt===WIN?.6:bt===FEN?.7:1)*(S.boss?.35:z.kind==='brute'?.6:1);
       if(z.bashT>=rate){
@@ -2998,7 +3074,7 @@ function updateZombies(dt){
     // attack the player
     const dNow=Math.hypot(z.x-P.x,z.y-P.y);
     z.atkT-=dt;
-    if(dNow<z.rad+16){
+    if(!S.human && dNow<z.rad+16){
       if(z.windup>0){
         z.windup-=dt;
         if(z.windup<=0 && dNow<z.rad+22 && !losBlocked(z.x,z.y,P.x,P.y)) zombieHitsPlayer(z);
@@ -3092,13 +3168,15 @@ function newDay(){
   gainXP(25);
   if(day>=3) metaFlag('days2');
   if(safehouse&&safehouse.up&&safehouse.up.rain){ const ex=stash.find(r=>r.id==='water'); if(ex) ex.q+=2; else stash.push({id:'water',q:2}); msg('🪣 The rain collector filled two bottles.','#9bd'); }
+  townNewDay();
 }
 function updateSpawns(dt){
   const th=threat(), dk=darkness(), h=(gameMin/60)%24;
   spawnT-=dt;
   if(spawnT<=0){
-    spawnT=(dk>.5?10:18)/(1+.12*Math.min(th,8));
-    if(zombies.length<170+12*Math.min(day,5)){
+    const sw=mod('swarm')?1.4:1;
+    spawnT=(dk>.5?10:18)/(1+.12*Math.min(th,8))/sw;
+    if(zombies.length<(170+12*Math.min(day,5))*sw){
       const n=RI(1,dk>.5?3:2);
       for(let i=0;i<n;i++) spawnEdge();
     }
@@ -3125,7 +3203,7 @@ function updateSpawns(dt){
   if(siegeArmed && !siegeActive && safehouse && isInSafehouse() && dk>.75 && !(story&&story.hold)){
     siegeArmed=false; siegeActive=true;
     const sc={x:(safehouse.x+safehouse.w/2)*TS, y:(safehouse.y+safehouse.h/2)*TS};
-    const wave=Math.round(clamp(9+day*3,9,40)*((safehouse.up&&safehouse.up.alarm)?.67:1));   // grows as the days drag on
+    const wave=Math.round(clamp(9+day*3,9,40)*((safehouse.up&&safehouse.up.alarm)?.67:1)*(hasResident('lookout')?.7:1));   // grows as the days drag on
     spawnWave(wave,sc.x,sc.y,150);
     shake=Math.max(shake,6);
     msg('THEY FOUND YOU. The horde is coming for the walls — hold the line.','#e55');
@@ -3140,7 +3218,7 @@ function updateSpawns(dt){
   // ---- escalation events ----
   if(power && day>=3 && h>=21){ power=false; msg('The streetlights stutter and die. The grid is gone for good.','#c96'); chron('The power failed.'); }
   if(day>=2 && dropDay<day && h>=10 && h<16){ dropDay=day; if(Math.random()<.75) spawnAirdrop(); }
-  if(day>=3 && (day-3)%2===0 && alphaDay<day && h>=22 && !boss && !(story&&story.hold)){ alphaDay=day; spawnAlpha(); }
+  if((mod('hunted') || (day>=3 && (day-3)%2===0)) && alphaDay<day && h>=22 && !boss && !(story&&story.hold)){ alphaDay=day; spawnAlpha(); }
   if(day>=2 && heliDay<day && h>=14 && h<18 && !heli){
     heliDay=day;
     if(Math.random()<.4){   // a flyover: it is not here for you, but everything follows the sound
@@ -3149,12 +3227,14 @@ function updateSpawns(dt){
       SFX.heli(); msg('🚁 A helicopter crosses the town, low. It does not slow down. The dead follow the sound.','#cb9');
     }
   }
+  updateTownEvents(dt,h);
   if(boss && boss.hp<=0) boss=null;
 }
 
 /* ---------- time & weather ---------- */
 function darkness(){
   const h=(gameMin/60)%24;
+  if(mod('dark')){ if(h>=20||h<6.5) return 1; if(h>=18.5) return (h-18.5)/1.5; if(h<8) return 1-(h-6.5)/1.5; return 0; }
   if(h>=21||h<5.5) return 1;
   if(h>=19.5) return (h-19.5)/1.5;
   if(h<7) return 1-(h-5.5)/1.5;
@@ -3218,6 +3298,7 @@ function updatePlayer(dt){
   let spd=(sprinting?150:88)*P.encSpd*fracMul;
   if(perk('adren') && P.hp<maxHp()*.3) spd*=1.15;
   if(P.reloadT>0) spd*=.85;
+  if(P.stimT>0){ P.stimT-=dt; spd*=1.25; if(P.stimT<=0) msg('The rush drains out of you.','#998'); }
   // facing: mouse / right stick / attack-drag aim; otherwise the direction of travel
   if(inputMode==='desktop' && hasMouse && !padAim) P.face=Math.atan2(mouseY/Z-(P.y-cam.y),mouseX/Z-(P.x-cam.x));
   else if(aimDrag.on) P.face=aimDrag.ang;
@@ -3237,7 +3318,8 @@ function updatePlayer(dt){
   }
   P.vx=(P.x-ox)/Math.max(dt,.001); P.vy=(P.y-oy)/Math.max(dt,.001);
   // stamina
-  if(sprinting){ P.sta-=(15+P.encStam*10)*(1-0.03*skillLvl('fitness'))*(1-.25*perk('marathon'))*dt; addSkill('fitness',0.12*dt); }
+  if(sprinting && P.stimT>0) P.sta=Math.min(100,P.sta+6*dt);
+  else if(sprinting){ P.sta-=(15+P.encStam*10)*(1-0.03*skillLvl('fitness'))*(1-.25*perk('marathon'))*dt; addSkill('fitness',0.12*dt); }
   else P.sta+=(P.moving?7:14)*dt*((weather==='rain'||weather==='storm')?.7:1);
   P.sta=clamp(P.sta,0,100);
   if(P.sta<=0 && !P.exhausted){ P.exhausted=true; P.sprint=false; $('btnRun').classList.remove('on'); msg('You are winded.','#998'); }
@@ -3290,7 +3372,7 @@ function updatePlayer(dt){
   const dk=districtAt(ptx,pty);
   if(dk!=='street' && dk!==curDistrict){ curDistrict=dk; msg('Entering '+DISTRICT_NAME[dk]+'.','#bcb'); }
   for(const p of pois){
-    if(p.found) continue;
+    if(p.found||p.hidden) continue;
     if(dist2(p.x,p.y,ptx+.5,pty+.5)<8*8){ p.found=true; miniDirty=true; msg(`Discovered: ${p.n}.`,'#bcb'); gainXP(10); }
   }
   if(P.healPool>0){ const h=Math.min(P.healPool,4*dt); P.healPool-=h; P.hp=clamp(P.hp+h,0,maxHp()); }
@@ -3309,6 +3391,8 @@ const UNLOCK_TEST={
   hunter:    ()=>!!(META.flags&&META.flags.lvl6),
   firefighter:()=>!!(META.flags&&META.flags.alpha),
   survivor:  ()=>(META.wins||0)>=1,
+  dispatcher:()=>((META.life&&META.life.saved)||0)>=3,
+  smuggler:  ()=>((META.life&&META.life.traded)||0)>=300,
 };
 function originUnlocked(id){ return !ORIGINS[id].lock || !!META.unlocks[id]; }
 function checkUnlocks(){   // returns the origins that just opened up
@@ -3318,7 +3402,8 @@ function checkUnlocks(){   // returns the origins that just opened up
 }
 function runScore(won){
   const surv=Math.max(0,Math.floor(((day-1)*1440+gameMin-480)/60));
-  return Math.round(surv*6 + kills*5 + (P?P.lvl:1)*40 + (story?story.notes.length:0)*20 + (run?run.alpha*300+run.elites*40:0) + (won?1500+Math.max(0,700-100*(day-1)):0));
+  const base=surv*6 + kills*5 + (P?P.lvl:1)*40 + (story?story.notes.length:0)*20 + (run?run.alpha*300+run.elites*40+(run.holdout||0)*200:0) + (won?1500+Math.max(0,700-100*(day-1))+savedCount()*250:0);
+  return Math.round(base*modMult());
 }
 function endRun(won,cause){
   const surv=Math.max(0,Math.floor(((day-1)*1440+gameMin-480)/60));
@@ -3330,9 +3415,18 @@ function endRun(won,cause){
   META.hist=META.hist||[];
   META.hist.unshift({seed:SEED,origin:P.origin,route:story?story.route:'',won,cause:cause||'',hours:surv,kills,lvl:P.lvl,score});
   META.hist.length=Math.min(META.hist.length,8);
+  if(run&&run.daily){ META.daily=META.daily||{}; const d=META.daily[run.daily]; if(!d||score>d.score) META.daily[run.daily]={score,won}; const ks=Object.keys(META.daily).sort(); while(ks.length>14) delete META.daily[ks.shift()]; }
   const unlocked=checkUnlocks();
   saveMeta();
   return {surv,score,best,unlocked};
+}
+function savedCount(){ return npcs.filter(n=>n.state==='home'||n.state==='follow').length; }
+function runExtraHtml(won){
+  const out=[], sv=savedCount();
+  if(sv) out.push(sv+' survivor'+(sv>1?'s':'')+(won?' got out with you':' left behind'));
+  if(run.mods&&run.mods.length) out.push(run.mods.map(id=>MODS[id].ico+' '+MODS[id].n).join(' · ')+' — score ×'+modMult().toFixed(2));
+  if(run.daily) out.push('Daily run · '+run.daily);
+  return out.length?'<br>'+out.map(esc).join('<br>'):'';
 }
 function spanStr(totalH){ const dd=Math.floor(totalH/24), hh=totalH%24; return dd>0 ? dd+' day'+(dd>1?'s':'')+' and '+hh+' hour'+(hh!==1?'s':'') : totalH+' hour'+(totalH!==1?'s':''); }
 function storyHtml(){ return chronicle.map(c=>`<div class="chron"><b>Day ${c.d} · ${c.t}</b> — ${esc(c.s)}</div>`).join(''); }
@@ -3365,7 +3459,7 @@ function die(cause){
   $('deadStats').innerHTML=
     `${ORIGINS[P.origin].ico} ${esc(ORIGINS[P.origin].n)} · level <b>${P.lvl}</b> · ${esc(ROUTE_NAME[story.route])}<br>`+
     `You survived <b>${spanStr(r.surv)}</b> · destroyed <b>${kills}</b><br>`+
-    `Score <b>${r.score}</b>${r.best?' — a new best':''} · Seed <b>${SEED}</b>`;
+    `Score <b>${r.score}</b>${r.best?' — a new best':''} · Seed <b>${SEED}</b>`+runExtraHtml(false);
   $('deadStory').innerHTML=storyHtml();
   $('deadUnlock').innerHTML=unlockHtml(r.unlocked);
   hideOverlays();
@@ -3377,11 +3471,11 @@ function winRun(){
   chron('Got out of Deadfall.');
   clearSave(); ambSet(0,0); SFX.win();
   const r=endRun(true,'');
-  $('winEpi').textContent=EPILOGUE[story.route];
+  $('winEpi').textContent=EPILOGUE[story.route]+(savedCount()?' And this time, you are not the only one who made it.':'');
   $('winStats').innerHTML=
     `${ORIGINS[P.origin].ico} ${esc(ORIGINS[P.origin].n)} · level <b>${P.lvl}</b> · ${esc(ROUTE_NAME[story.route])}<br>`+
     `Out in <b>${spanStr(r.surv)}</b> · destroyed <b>${kills}</b><br>`+
-    `Score <b>${r.score}</b>${r.best?' — a new best':''} · Seed <b>${SEED}</b>`;
+    `Score <b>${r.score}</b>${r.best?' — a new best':''} · Seed <b>${SEED}</b>`+runExtraHtml(true);
   $('winStory').innerHTML=storyHtml();
   $('winUnlock').innerHTML=unlockHtml(r.unlocked);
   hideOverlays();
@@ -3481,6 +3575,7 @@ function spawnStoryZombies(){   // the man with the truck keys waits where the n
   zombies.push(z);
 }
 function storyZombieKilled(z){
+  if(z.story==='holdout') holdoutKill();
   if(z.story==='keys' && !story.have.keys){ msg(`${story.names.MECH} goes down. The keys are still clipped to his belt.`,'#e6c86e'); storyKey('keys'); }
 }
 
@@ -3597,6 +3692,7 @@ function fxLabel(i,f){
   const st=story, s=st?st.step:0, r=st?st.route:'';
   switch(f.kind){
     case 'bench': return 'WORKBENCH';
+    case 'trader': return 'TRADE';
     case 'generator': return (r==='signal'&&s===3)?'START GENERATOR' : (r==='signal'&&s>3)?null : 'GENERATOR';
     case 'radio': return 'RADIO';
     case 'truck': return (r==='road'&&s===3)?'START TRUCK' : (r==='road'&&s===5)?'DRIVE' : (r==='road'&&s===4)?null : 'TOW TRUCK';
@@ -3608,6 +3704,7 @@ function fxLabel(i,f){
 function fxInteract(i,f){
   const st=story, s=st.step, r=st.route, fx=((i%MW)+.5)*TS, fy=(((i/MW)|0)+.5)*TS;
   if(f.kind==='bench'){ openBag('craft'); return; }
+  if(f.kind==='trader'){ openTrade(); return; }
   if(f.kind==='generator'){
     if(r==='signal'&&s===3){
       SFX.engine(); msg('The generator coughs, catches, and ROARS. The relay lights up. Everything in town heard it.','#e55');
@@ -3648,6 +3745,7 @@ const HINTS=[
   {k:'needs',  d:'Watch food and water. The town has both — if you dare.'},
   {k:'night',  d:'Night falls hard here. Find a flashlight before dark.'},
   {k:'craft',  d:'Rags, tape and scrap become bandages, traps and bombs. Check CRAFT in your pack.'},
+  {k:'people', d:'Not everyone in town is dead. Watch for flares, and listen at doors.'},
 ];
 let hinted={};
 function hintOnce(k){ hinted[k]=1; }
@@ -3671,6 +3769,426 @@ function updateAmbience(dt){
     if(!heli.landed){ heli.x+=heli.vx*dt; heli.y+=heli.vy*dt; heli.nt=(heli.nt||0)-dt; if(heli.nt<=0){ heli.nt=.7; emitNoise(heli.x,heli.y,20); }
       if(heli.t>26) heli=null; }
   }
+}
+
+/* ================= THE LIVING TOWN =================
+   Survivors, the Peddler, marauders and town events. All of it is generated on its own random
+   stream after the town and the story, so a seed still builds exactly the streets it always did
+   (and a save from before this existed simply wakes up with neighbours). */
+let npcs=[], talkOpen=false, tradeOpen=false, talkOpts=[], herd=null, blaze=null, _stock=null, _shoutT=0;
+let herdDay=0, fireDay=0, flareDay=0, evtHours={herd:12,fire:15,flare:12}, pendingMods=[], dailyKey='';
+
+const ROLES={
+  medic:    {n:'Medic',     ico:'🩺', perk:'Patches you up once a day. With a medic at home, resting also stops bleeding and sets bones.'},
+  mechanic: {n:'Mechanic',  ico:'🔧', perk:'Repairs the weapon in your hands once a day, and counts as a workbench at home.'},
+  lookout:  {n:'Lookout',   ico:'🔭', perk:'At home: sieges arrive a third weaker.'},
+  cook:     {n:'Cook',      ico:'🍲', perk:'At home: two hot meals in the stash every morning.'},
+  scavenger:{n:'Scavenger', ico:'🎒', perk:'At home: brings back two finds for the stash every morning.'},
+  hunter:   {n:'Hunter',    ico:'🏹', perk:'A rifle at your side (it is loud). At home: fresh jerky every morning.'},
+};
+const NPC_FIRST={
+  medic:`"I was on shift when it started. I've been rationing gauze ever since. You don't look bitten — let me see your arms."`,
+  mechanic:`"Don't shoot. I fix things. I fixed that door, didn't I? It held for three days."`,
+  lookout:`"I watched you come up the street. You walk loud. I can teach you to hear them first."`,
+  cook:`"I've been living on tinned peaches. Give me a stove and four walls and I'll feed whoever's left."`,
+  scavenger:`"I know every back door on this block. I just can't carry it all alone, and I can't fight worth a damn."`,
+  hunter:`"Rifle's good. Hands are steady. I'd just run out of reasons to go outside."`,
+};
+const NPC_HOME={
+  medic:`"Sit. Let me look at you. You'd be amazed what people walk around with."`,
+  mechanic:`"Hand it over. I can't promise pretty, but it'll swing true."`,
+  lookout:`"Quiet out there. The wrong kind of quiet. I'll bang on the pipe if they come."`,
+  cook:`"It isn't much. It's hot, though. When did you last eat something hot?"`,
+  scavenger:`"Found a few things while you were out. Don't ask which houses."`,
+  hunter:`"Say the word and I'll walk with you. Otherwise I'll keep us fed."`,
+};
+const NEEDS={
+  bandage:{label:'a bandage', ask:`"…But I'm no use to anyone like this. I'm bleeding. A bandage — anything."`, ids:['bandage','medkit']},
+  water:  {label:'water',     ask:`"…I haven't had water in two days. I can't even think straight."`, ids:['water','soda','energy']},
+  food:   {label:'food',      ask:`"…I haven't eaten since it started. I won't make it a block."`, ids:['beans','soup','jerky','mre','chips']},
+  pills:  {label:'painkillers',ask:`"…My head is splitting — I took a fall getting in here. Painkillers, if you have them."`, ids:['pills','medkit']},
+};
+const NPC_SKIN=['#caa27a','#a9825c','#e0b896','#8a6648'], NPC_SHIRT=['#8a6a3a','#3f6a7a','#6a7a3f','#7a3f4a','#55507a','#3f7a62','#7a5a6a'], NPC_HAIR=['#2b241d','#5a3a22','#8a7a5a','#1a1a1c','#6a6a6a'];
+
+/* ---------- run modifiers ---------- */
+const MODS={
+  swarm: {n:'The Swarm',   ico:'🧟', d:'Far more of the dead, and they keep coming.', x:.3},
+  scarce:{n:'Lean Times',  ico:'🥫', d:'A third of what you would have found is already gone.', x:.25},
+  dark:  {n:'The Long Dark',ico:'🌑', d:'Night comes early and stays late. The grid is already dead.', x:.2},
+  frail: {n:'Glass Bones', ico:'🦴', d:'You start with 70 health, not 100.', x:.2},
+  hunted:{n:'Hunted',      ico:'👁️', d:'The Alpha comes on the first night, and every night after.', x:.4},
+};
+function mod(id){ return !!(run&&run.mods&&run.mods.includes(id)); }
+function modMult(){ let m=1; if(run&&run.mods) for(const id of run.mods) if(MODS[id]) m+=MODS[id].x; return m; }
+function todayKey(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+/* ---------- generation ---------- */
+function genTown(){
+  const main=curRng; curRng=mulberry32((SEED^0x5EEDF00D)>>>0);
+  npcs=[]; _stock=null;
+  story.trader=null; story.holdout=-1; story.credit=0; story.sold=null; story.cleared=false; story.mapSold=false;
+  const sb=buildings[startHouseIdx], sx=sb.x+sb.w/2, sy=sb.y+sb.h/2;
+  const far=(B,d)=>dist2(B.x+B.w/2,B.y+B.h/2,sx,sy)>=d*d;
+  // the Peddler's van: parked by a kerb, well away from where you wake
+  for(let k=0;k<5000&&story.trader==null;k++){
+    const tx=RI(RING0+4,RING1-4), ty=RI(RING0+4,RING1-4), i=idx(tx,ty), t=tiles[i];
+    if(!(t===G||t===PK)||keep[i]||tvar[i]||conts.has(i)||dist2(tx,ty,sx,sy)<16*16) continue;
+    let ok=true; for(const o of NB8) if(TSOL[tiles[i+o]]){ ok=false; break; }
+    if(!ok) continue;
+    let street=false; for(const o of [2,-2,2*MW,-2*MW]){ const n=tiles[i+o]; if(n===SW||n===RD){ street=true; break; } }
+    if(!street) continue;
+    tiles[i]=FX; tvar[i]=0; keep[i]=2; fixtures.set(i,{kind:'trader'}); refreshBlk(i);
+    story.trader=i; pois.push({t:'trader',n:"The Peddler's Van",x:tx+.5,y:ty+.5,bi:-1,found:false});
+  }
+  // marauders hold one ordinary building, and sit on something worth taking
+  const clean=B=>contsIn(B,c=>!!(c.key||c.note)).length===0;
+  const hc=buildings.filter((B,bi)=>bi!==startHouseIdx && ['house','farmhouse','warehouse','market','barn'].includes(B.type) && clean(B) && far(B,24) && !(story.keyPoi&&story.keyPoi.bi===bi));
+  if(hc.length){
+    const B=pick(hc); story.holdout=buildings.indexOf(B);
+    const cs=contsIn(B); if(cs.length){ const c=conts.get(pick(cs)); c.table='mil'; c.items=rollLoot('mil'); c.tier=2; c.locked=false; }
+    pois.push({t:'holdout',n:'Marauder Holdout',x:B.x+B.w/2,y:B.y+B.h/2,bi:-1,found:false,hidden:true});
+  }
+  // people who made it this far, each hiding somewhere different
+  const types=['house','farmhouse','market','hardware','clinic','warehouse','gunshop','barn'];
+  const sc=shuffle(buildings.filter((B,bi)=>bi!==startHouseIdx && bi!==story.holdout && types.includes(B.type) && far(B,13)));
+  const usedNames=new Set(Object.values(story.names).join(' ').split(' '));
+  const names=shuffle(FIRSTNAMES.filter(f=>!usedNames.has(f))), roles=shuffle(Object.keys(ROLES));
+  const want=buildings.length>30?4:3, chosen=[];
+  for(const B of sc){ if(chosen.length>=want) break; if(chosen.some(C=>dist2(C.x,C.y,B.x,B.y)<14*14)) continue; chosen.push(B); }
+  chosen.forEach((B,k)=>{
+    const s=randFloorIn(B)||{x:(B.x+B.w/2)*TS,y:(B.y+B.h/2)*TS};
+    const need=curRng()<.55?pick(Object.keys(NEEDS)):null;
+    const n={id:k,name:names[k]||('Survivor '+(k+1)),role:roles[k%roles.length],x:s.x,y:s.y,hp:80,maxhp:80,state:'wait',need,needDone:!need,
+      met:false,called:false,flared:false,used:0,face:R(-3,3),atkCd:0,swingT:0,vis:0,ph:R(0,6),walkPh:0,stuckT:0,jam:0,lx:s.x,ly:s.y,moving:false,
+      skin:pick(NPC_SKIN),shirt:pick(NPC_SHIRT),hair:pick(NPC_HAIR),bi:buildings.indexOf(B)};
+    n.poi={t:'survivor',n:n.name+' — '+ROLES[n.role].n,x:s.x/TS,y:s.y/TS,bi:-1,found:false,hidden:true};
+    npcs.push(n); pois.push(n.poi);
+  });
+  curRng=main;
+}
+function spawnHoldout(){
+  if(!story||story.holdout<0||story.cleared) return;
+  const B=buildings[story.holdout]; if(!B) return;
+  for(let k=0;k<3;k++){
+    const s=randFloorIn(B); if(!s) continue;
+    const z=makeZombie(s.x,s.y,'marauder',true);
+    z.story='holdout'; z.name='MARAUDER'; z.shirt=pick(['#4a2a2a','#2e2e34','#3a3524']); z.home={x:s.x,y:s.y}; z.shootCd=R(.5,1.5); z.aimT=0; z.aimA=0;
+    zombies.push(z);
+  }
+}
+function holdoutKill(){
+  if(zombies.some(z=>z.story==='holdout')) return;
+  story.cleared=true; gainXP(70); run.holdout=1;
+  msg('The last of them is down. Whatever they were guarding is yours.','#e6c86e'); chron('Cleared the marauder holdout.');
+  const k=pois.findIndex(p=>p.t==='holdout'); if(k>=0){ pois[k].n='Holdout (cleared)'; pois[k].found=true; pois[k].hidden=false; } miniDirty=true;
+}
+
+/* ---------- marauders: people with guns. They aim, then fire — break line of sight or dodge the shot ---------- */
+function humanAI(z,dt,dcur,near){
+  if(z.shootCd>0) z.shootCd-=dt;
+  if(!(z.state==='chase' && z.sees && dcur<330)){ z.aimT=0; return false; }
+  const a=Math.atan2(P.y-z.y,P.x-z.x);
+  if(z.aimT<=0 && z.shootCd<=0){ z.aimT=.85; z.aimA=a; }
+  if(z.aimT>0){
+    if(z.aimT>.15) z.aimA+=clamp(angN(a-z.aimA),-2.2*dt,2.2*dt);     // the last instant is committed: that is your window
+    z.face=z.aimA; z.aimT-=dt;
+    if(z.aimT<=0){
+      z.shootCd=R(1.1,1.8);
+      const ca=Math.cos(z.aimA), sa=Math.sin(z.aimA); let hx=z.x, hy=z.y, hit=false;
+      for(let d=12;d<400;d+=8){
+        hx=z.x+ca*d; hy=z.y+sa*d;
+        const tx=Math.floor(hx/TS), ty=Math.floor(hy/TS);
+        if(!inb(tx,ty)||(blk[ty*MW+tx]&2)) break;
+        if(dist2(hx,hy,P.x,P.y)<13*13){ hit=true; break; }
+      }
+      tracers.push({x0:z.x+ca*12,y0:z.y+sa*12,x1:hx,y1:hy,t:.08});
+      emitNoise(z.x,z.y,36);
+      if(near) SFX.shot();
+      if(hit){
+        if(P.iframe>0) floater(P.x,P.y-18,'dodged','#bd9');
+        else { const ar=P.armor.torso, dr=ar?astats(ar).dr:0; if(ar) wearArmor('torso',2);                // a vest earns its weight here
+          if(hurtPlayer(Math.max(3,11+R(0,5)-dr),'a marauder',z.x,z.y) && state==='play'){ if(Math.random()<.3) P.bleeding=true; msg('You are hit.'+(P.bleeding?' You are bleeding.':''),'#e88'); } }
+      }
+    }
+  } else z.face+=clamp(angN(a-z.face),-5*dt,5*dt);
+  return true;
+}
+
+/* ---------- survivors ---------- */
+function hasResident(role){ return npcs.some(n=>n.state==='home'&&n.role===role); }
+function followers(){ return npcs.filter(n=>n.state==='follow'); }
+function npcHurt(n,dmg){
+  n.hp-=dmg; burst(n.x,n.y,4,'#7a1414',90,.3); floater(n.x,n.y-16,'-'+Math.round(dmg),'#e8a08a');
+  if(n.hp>0) return;
+  n.state='dead'; n.poi.n=n.name+' (dead)';
+  corpses.push({x:n.x,y:n.y,rot:n.face,skin:n.skin,shirt:n.shirt,rad:10}); addDecal(n.x,n.y,14,.85);
+  msg(`${n.name} is gone.`,'#e55'); chron(`${n.name} the ${ROLES[n.role].n.toLowerCase()} did not make it.`); SFX.hurt(); hudDirty=true;
+}
+function updateNpcs(dt){
+  const lead=perk('leader');
+  for(const n of npcs){
+    if(n.state==='dead') continue;
+    if(n.swingT>0) n.swingT-=dt;
+    if(n.state!=='follow'){
+      if(n.hp<n.maxhp) n.hp=Math.min(n.maxhp,n.hp+2*dt);
+      if(!n.met && !n.called && dist2(n.x,n.y,P.x,P.y)<(5.5*TS)*(5.5*TS)){
+        n.called=true; SFX.click(); ripple(n.x,n.y,'rgba(140,200,230,');
+        msg(`Someone hisses from close by: "Hey — over here. I'm not one of them."`,'#9cd');
+      }
+      continue;
+    }
+    n.atkCd-=dt;
+    const hunter=n.role==='hunter', reach=hunter?250:46;
+    let tz=null, bd=reach*reach;
+    for(const z of zombies){
+      const d2=dist2(z.x,z.y,n.x,n.y);
+      if(d2<(z.rad+15)*(z.rad+15) && z.state==='chase' && z.stun<=0 && !(ZTYPE[z.kind]||{}).human){   // whatever reaches you reaches them
+        z.natk=(z.natk||0)-dt;
+        if(z.natk<=0){ z.natk=1.2; npcHurt(n,z.dmg*.8); if(n.state==='dead') break; }
+      }
+      if(d2<bd && !losBlocked(n.x,n.y,z.x,z.y)){ bd=d2; tz=z; }
+    }
+    if(n.state==='dead') continue;
+    if(tz){
+      n.face=Math.atan2(tz.y-n.y,tz.x-n.x);
+      if(n.atkCd<=0){
+        const mul=1+.5*lead;
+        if(hunter){ n.atkCd=1.3; tracers.push({x0:n.x,y0:n.y,x1:tz.x,y1:tz.y,t:.08}); SFX.shot(); emitNoise(n.x,n.y,28); hitZombie(tz,R(34,48)*mul,n.face,.25,{}); }
+        else { n.atkCd=.75; n.swingT=.15; SFX.thud(); hitZombie(tz,R(13,20)*mul,n.face,.2,{melee:true}); }
+      }
+    } else if(n.hp<n.maxhp) n.hp=Math.min(n.maxhp,n.hp+3*dt);
+    // keep up: follow the same path field the dead use, open doors, and never get lost behind a window
+    const d=Math.hypot(P.x-n.x,P.y-n.y), engaged=tz&&!hunter;
+    if(d>TS*2.1 && !engaged){
+      let gx=P.x, gy=P.y;
+      if(d>TS*2.6){ const j=flowStep(n); if(j>=0){ gx=((j%MW)+.5)*TS; gy=(((j/MW)|0)+.5)*TS; } }
+      const dx=gx-n.x, dy=gy-n.y, m=Math.hypot(dx,dy)||1, sp=d>TS*7?158:104;
+      const hit=moveBody(n,dx/m*sp*dt,dy/m*sp*dt,9);
+      if(!tz) n.face+=clamp(angN(Math.atan2(dy,dx)-n.face),-8*dt,8*dt);
+      n.walkPh+=sp*dt*.085; n.moving=true;
+      if(hit>=0 && tiles[hit]===DR && !doorOpen.has(hit) && !(barricades.get(hit)>0)){ setDoor(hit,true); SFX.door(); }
+    } else n.moving=false;
+    n.poi.x=n.x/TS; n.poi.y=n.y/TS;
+    n.stuckT+=dt;
+    if(n.stuckT>1){ const moved=dist2(n.x,n.y,n.lx,n.ly); n.lx=n.x; n.ly=n.y; n.stuckT=0; n.jam=(d>TS*3.5&&moved<64)?n.jam+1:0; }
+    if(n.jam>=3 || d>TS*20){ const s=nearFree(P.x,P.y,2); if(s){ burst(n.x,n.y,5,'#9a927e',50,.4); n.x=s.x; n.y=s.y; n.jam=0; } }
+  }
+}
+function needIdx(need){ const ids=NEEDS[need].ids; for(const id of ids){ const i=P.inv.findIndex(r=>r.id===id); if(i>=0) return i; } return -1; }
+function npcInSafe(n){ if(!safehouse) return false; const tx=Math.floor(n.x/TS), ty=Math.floor(n.y/TS), b=safehouse; return tx>b.x&&tx<b.x+b.w-1&&ty>b.y&&ty<b.y+b.h-1; }
+function npcFollow(n){
+  const cap=1+perk('leader');
+  const fl=followers().filter(o=>o!==n);
+  while(fl.length>=cap){ const o=fl.shift(); o.state=(o.settled&&npcInSafe(o))?'home':'wait'; msg(`${o.name} stays behind.`,'#998'); }
+  n.state='follow'; n.jam=0; n.stuckT=0; n.lx=n.x; n.ly=n.y; hudDirty=true;
+  n.say=`"Right behind you. Don't run where I can't follow."`;
+}
+function npcWait(n){ n.state=(n.settled&&npcInSafe(n))?'home':'wait'; hudDirty=true; n.say=`"I'll stay put. Come back for me."`; }
+function npcSettle(n){
+  const first=!n.settled;
+  n.state='home'; n.settled=true; hudDirty=true; miniDirty=true;
+  n.say=`"Walls, a roof, somebody watching the door. I'd forgotten. I'll earn my keep."`;
+  if(first){ gainXP(60); run.saved=(run.saved||0)+1; metaCount('saved',1); chron(`Brought ${n.name} the ${ROLES[n.role].n.toLowerCase()} home to the safehouse.`); SFX.objective(); }
+}
+function npcService(n){
+  if(n.role==='medic'){
+    P.hp=maxHp(); P.bleeding=false; if(P.contam>0){ P.contamP*=.2; } if(P.fracture===1){ P.fracture=2; P.fractureT=2*1440; }
+    n.say=P.infected?`"I've done what I can. That fever, though — that needs antibiotics. I don't have any."`:`"There. Good as I can make you. Try not to undo it."`; SFX.pick();
+  } else {
+    const w=curW(), s=w&&wstats(w);
+    if(w&&s.t==='weapon'&&!s.unbreak){ w.dur=s.durMax; n.say=`"There. Like it came off the rack."`; SFX.craft(); syncAtkGlyph(); }
+    else { n.say=`"Put something that swings in your hands and I'll see to it."`; return; }
+  }
+  n.used=day;
+}
+function talkTo(n){
+  talkOpen=true; P.act=null;
+  const Rl=ROLES[n.role], first=!n.met; let text; talkOpts=[];
+  if(first){
+    n.met=true; n.poi.found=true; n.poi.hidden=false; miniDirty=true; gainXP(15);
+    chron(`Found ${n.name}, a ${Rl.n.toLowerCase()}, hiding in ${DISTRICT_NAME[districtAt(Math.floor(n.x/TS),Math.floor(n.y/TS))]}.`);
+  }
+  if(!n.needDone){
+    const N=NEEDS[n.need], i=needIdx(n.need);
+    text=(first?NPC_FIRST[n.role]+'\n\n':'')+N.ask;
+    if(i>=0) talkOpts.push([`Give ${ITEMS[P.inv[i].id].n.toLowerCase()}`,()=>{ consume(i); n.needDone=true; gainXP(20); SFX.pick(); n.say=`"Thank you. I mean it. Tell me what you need."`; syncBag(); talkTo(n); }]);
+    else talkOpts.push([`(You have no ${N.label} to give)`,null]);
+  } else {
+    text=n.say||(first?NPC_FIRST[n.role]:n.state==='home'?NPC_HOME[n.role]:n.state==='follow'?`"What is it?"`:`"Still here. Still breathing."`);
+    n.say=null;
+    if((n.role==='medic'||n.role==='mechanic')) talkOpts.push(n.used===day?[n.role==='medic'?'(Already patched you up today)':'(Already fixed something today)',null]:[n.role==='medic'?'Patch me up':'Fix the weapon in my hands',()=>{ npcService(n); talkTo(n); }]);
+    if(n.state==='follow'){
+      if(npcInSafe(n)) talkOpts.push(['This is home now — stay here',()=>{ npcSettle(n); talkTo(n); }]);
+      talkOpts.push(['Wait here',()=>{ npcWait(n); talkTo(n); }]);
+    } else talkOpts.push(['Come with me',()=>{ npcFollow(n); talkTo(n); }]);
+  }
+  talkOpts.push(['Leave',closeTalk]);
+  $('talkName').textContent=n.name.toUpperCase();
+  $('talkRole').textContent=`${Rl.ico} ${Rl.n.toUpperCase()} · ${Math.round(n.hp)}/${n.maxhp} health`;
+  $('talkPerk').textContent=Rl.perk;
+  $('talkText').textContent=text;
+  const box=$('talkOpts'); box.innerHTML='';
+  talkOpts.forEach(([label,fn],k)=>{ const b=el('button','ghost'+(fn?' on':''),`${(fn&&inputMode==='desktop'&&!padAim)?'[ '+(k+1)+' ]  ':''}${esc(label)}`); if(fn) b.addEventListener('click',fn); else b.disabled=true; box.appendChild(b); });
+  $('talkScreen').style.display='flex';
+}
+function closeTalk(){ talkOpen=false; $('talkScreen').style.display='none'; hudDirty=true; }
+function townNewDay(){   // what the people at home did overnight
+  evtHours={herd:8+Math.random()*10,fire:9+Math.random()*12,flare:10+Math.random()*4};
+  if(!safehouse) return;
+  const give=(id,q)=>{ const ex=!isGear(ITEMS[id])&&stash.find(r=>r.id===id); if(ex) ex.q+=q; else { const r=mkRow(id,1); if(!isGear(ITEMS[id])) r.q=q; stash.push(r); } };
+  if(hasResident('cook')){ give('soup',2); msg('🍲 The cook left two hot meals in the stash.','#9bd'); }
+  if(hasResident('hunter')){ give('jerky',2); msg('🏹 The hunter hung fresh jerky to dry.','#9bd'); }
+  if(hasResident('scavenger')){ const pool=['ammo','bandage','scrap','tape','cloth','nails','planks','water','beans','battery','alcohol','parts','shells','pills']; give(pool[Math.floor(Math.random()*pool.length)],1); give(pool[Math.floor(Math.random()*pool.length)],1); msg('🎒 The scavenger came back with a few things.','#9bd'); }
+}
+
+/* ---------- the Peddler ---------- */
+const VAL={chips:3,beans:6,soup:6,jerky:6,mre:12,water:6,soda:4,energy:8,bandage:6,pills:10,antiseptic:12,splint:10,medkit:30,antibiotics:70,stim:24,
+  ammo:12,shells:14,rifleammo:16,bolts:8,flash:20,battery:10,lockpick:8,repairkit:16,patchkit:14,townmap:40,
+  knife:10,cleaver:16,hatchet:22,machete:34,katana:70,axe:40,spear:18,bat:16,nailbat:26,crowbar:24,pipe:16,hammer:14,pan:8,golf:12,shovel:18,sledge:50,
+  pistol:70,revolver:90,smg:120,shotgun:110,rifle:140,xbow:80,
+  hardhat:14,helmet:40,firehelm:30,riothelm:60,denim:12,leather:30,turnout:40,vest:60,flak:85,jeans:10,pads:22,cargo:30,
+  flare:6,molotov:14,pipebomb:30,decoy:10,spiketrap:12,planks:2,nails:3,scrap:3,cloth:2,tape:4,alcohol:5,powder:8,parts:7,fannypack:10,daypack:30,duffel:50,rucksack:80};
+function unitVal(row){   // what one unit of this is worth, before the Peddler takes a cut
+  const d=ITEMS[row.id]; let v=(VAL[row.id]||4)/(d.qty||1);
+  if(row.rar!=null) v*=[.5,1,1.7,2.8,6][row.rar];
+  if(d.t==='weapon'){ const s=wstats(row); if(!s.unbreak) v*=.45+.55*clamp(row.dur/s.durMax,0,1); }
+  else if(d.t==='armor') v*=.45+.55*clamp(row.cond/astats(row).condMax,0,1);
+  return v;
+}
+function sellPrice(row){ return Math.max(1,Math.floor(unitVal(row)*(perk('haggler')?.62:.45))); }
+function buyPrice(e){ return e.price!=null?e.price:Math.max(1,Math.ceil(unitVal(e.row)*(e.row.q||1)*(perk('haggler')?.85:1.1))); }
+function traderStock(){   // rolled once per day from the seed, so closing the hatch never rerolls it
+  if(_stock&&_stock.day===day&&_stock.seed===SEED) return _stock.items;
+  const main=curRng; curRng=mulberry32((Math.imul(SEED,31)+day*977+5)>>>0);
+  const items=[], add=(id,q,tier)=>{ const r=mkRow(id,tier==null?1:tier,tier==null); if(q) r.q=q; items.push({row:r}); };
+  add('ammo',12); add(pick(['shells','rifleammo','bolts']),8); add('bandage',2); add('medkit',1); add('water',2); add('mre',1); add('repairkit',1); add('stim',1);
+  if(curRng()<.6) add('antibiotics',1);
+  add(pick(['machete','axe','katana','crowbar','sledge','spear']),0,day>3?3:2);
+  add(pick(['pistol','revolver','shotgun','xbow','smg','rifle']),0,2);
+  add(pick(['vest','helmet','leather','pads','flak','riothelm','cargo']),0,2);
+  if(curRng()<.5) add(pick(['daypack','duffel','rucksack']));
+  add(pick(['molotov','pipebomb','decoy','spiketrap']),2);
+  if(!story.mapSold) items.push({row:{id:'townmap',q:1},map:true});
+  curRng=main;
+  if(story.sold&&story.sold.day===day) for(const k of story.sold.idx) if(items[k]) items[k].sold=true;
+  if(npcs.some(n=>n.state==='wait'&&!n.met&&!n.poi.found)) items.push({tip:'survivor',price:12,label:'A tip: where someone is hiding'});
+  if(story.holdout>=0&&!story.cleared&&!pois.some(p=>p.t==='holdout'&&p.found)) items.push({tip:'holdout',price:10,label:'A warning: who to stay away from'});
+  _stock={day,seed:SEED,items};
+  return items;
+}
+function buyStock(k){
+  const items=traderStock(), e=items[k]; if(!e||e.sold) return;
+  const price=buyPrice(e);
+  if(story.credit<price){ msg('"Come back when you can cover it."','#c96'); SFX.click(); return; }
+  if(e.tip){
+    if(e.tip==='survivor'){ const c=npcs.filter(n=>n.state==='wait'&&!n.met&&!n.poi.found); if(c.length){ const n=c[0]; n.poi.found=true; n.poi.hidden=false; msg(`"${n.name}. ${ROLES[n.role].n}. Holed up in ${DISTRICT_NAME[districtAt(Math.floor(n.x/TS),Math.floor(n.y/TS))]}. Marked it for you."`,'#9cd'); } }
+    else { const p=pois.find(q=>q.t==='holdout'); if(p){ p.found=true; p.hidden=false; msg('"They shoot first. Come at them from where they can\'t see you — or don\'t come at all."','#9cd'); } }
+    items.splice(k,1); miniDirty=true;
+  } else {
+    const row=JSON.parse(JSON.stringify(e.row));
+    if(!addRow(row)){ msg('Backpack is full.','#c96'); return; }
+    e.sold=true; if(e.map) story.mapSold=true;
+    if(!story.sold||story.sold.day!==day) story.sold={day,idx:[]};
+    story.sold.idx.push(k);
+  }
+  story.credit-=price; metaCount('traded',price); SFX.pick(); syncTrade(); syncAtkGlyph();
+}
+function sellRow(i,all){
+  const row=P.inv[i]; if(!row) return;
+  const gear=isGear(ITEMS[row.id]), units=gear?1:(all?row.q:1), gain=sellPrice(row)*units;
+  if(gear||units>=row.q) P.inv.splice(i,1); else row.q-=units;
+  story.credit+=gain; metaCount('traded',gain); SFX.pick(); syncTrade(); syncAtkGlyph();
+}
+function openTrade(){
+  tradeOpen=true; P.act=null;
+  const p=pois.find(q=>q.t==='trader'); if(p&&!p.found){ p.found=true; miniDirty=true; }
+  if(!story.metTrader){ story.metTrader=true; chron('Found the Peddler and his armoured van.'); }
+  syncTrade(); $('tradeScreen').style.display='flex';
+}
+function closeTrade(){ tradeOpen=false; $('tradeScreen').style.display='none'; hudDirty=true; saveGame(); }
+function syncTrade(){
+  $('tradeCredit').textContent=`CREDIT ${story.credit}`;
+  const L=$('tradeBuy'), Rr=$('tradeSell'); L.innerHTML=''; Rr.innerHTML='';
+  traderStock().forEach((e,k)=>{
+    const price=buyPrice(e), row=el('div','item'+(e.sold?' equipped':''));
+    if(e.tip) row.innerHTML=`<div class="iico">💬</div><div class="inm">${esc(e.label)}</div>`;
+    else { const d=ITEMS[e.row.id], af=hasQuality(d)?affixLine(e.row):''; row.innerHTML=`<div class="iico">${d.ico}</div><div class="inm">${rowTitle(e.row)} <small>${esc(idesc(e.row))}${af?'<br>'+esc(af):''}</small></div>`; }
+    row.appendChild(btn('use',e.sold?'SOLD':'BUY '+price,()=>buyStock(k),e.sold||story.credit<price));
+    L.appendChild(row);
+  });
+  if(!P.inv.length) Rr.appendChild(el('div','item','<div class="inm" style="color:#6d675a">Nothing in your pack to sell. He does not buy what you are holding or wearing.</div>'));
+  P.inv.forEach((r,i)=>{
+    const d=ITEMS[r.id], pr=sellPrice(r), row=el('div','item');
+    row.innerHTML=`<div class="iico">${d.ico}</div><div class="inm">${rowTitle(r)} <small>${pr} each</small></div>`;
+    row.appendChild(btn('stash','SELL '+pr,()=>sellRow(i,false)));
+    if(!isGear(d)&&r.q>1) row.appendChild(btn('drop','ALL '+pr*r.q,()=>sellRow(i,true)));
+    Rr.appendChild(row);
+  });
+}
+
+/* ---------- town events: herds, fires, flares ---------- */
+function startHerd(){
+  const roads=roadList.filter(r=>Math.max(r.w,r.h)>=50); if(!roads.length) return false;
+  const r=roads[Math.floor(Math.random()*roads.length)], flip=Math.random()<.5;
+  const A=r.horiz?{x:flip?r.x+2:r.x+r.w-3,y:r.y+r.h/2}:{x:r.x+r.w/2,y:flip?r.y+2:r.y+r.h-3};
+  const B=r.horiz?{x:flip?r.x+r.w-3:r.x+2,y:r.y+r.h/2}:{x:r.x+r.w/2,y:flip?r.y+r.h-3:r.y+2};
+  if(dist2(A.x,A.y,P.x/TS,P.y/TS)<22*22) return false;
+  const n=Math.round((12+3*Math.min(day,6))*(mod('swarm')?1.4:1)), zs=[];
+  for(let k=0;k<n;k++){
+    const s=nearFree(A.x*TS,A.y*TS,4); if(!s) continue;
+    const z=makeZombie(s.x,s.y,rollZombieKind(darkness()>.6,null));
+    z.state='invest'; z.tx=B.x*TS+R(-60,60); z.ty=B.y*TS+R(-60,60); z.wanderT=R(4,9); zombies.push(z); zs.push(z);
+  }
+  if(zs.length<5) return false;
+  herd={zs,t:260,x:A.x,y:A.y,ct:0};
+  msg(`A herd is on the move along the ${r.horiz?'east–west':'north–south'} road through ${DISTRICT_NAME[districtAt(Math.floor((A.x+B.x)/2),Math.floor((A.y+B.y)/2))]||'town'}. Stay off the street.`,'#e55');
+  chron('A herd moved through town.'); SFX.groan(); miniDirty=true;
+  return true;
+}
+function startBlaze(){
+  const cand=buildings.filter((B,bi)=>{
+    if(bi===startHouseIdx||(safehouse&&safehouse.x===B.x&&safehouse.y===B.y)||npcs.some(n=>n.bi===bi&&n.state!=='dead'&&n.state!=='follow')) return false;
+    const d=Math.hypot(B.x+B.w/2-P.x/TS,B.y+B.h/2-P.y/TS); return d>10&&d<48;
+  });
+  if(!cand.length) return false;
+  const B=cand[Math.floor(Math.random()*cand.length)], k=RI(5,8);
+  for(let j=0;j<k;j++){ const s=randFloorIn(B); if(s) fires.push({x:s.x,y:s.y,r:.95*TS,t:R(50,75)}); }
+  emitNoise((B.x+B.w/2)*TS,(B.y+B.h/2)*TS,45);
+  const p={t:'fire',n:'Burning '+B.name.toLowerCase(),x:B.x+B.w/2,y:B.y+B.h/2,bi:-1,found:true,dyn:true}; pois.push(p); blaze={p,t:78};
+  msg(`Smoke over ${DISTRICT_NAME[districtAt(B.x+1,B.y+1)]}: a ${B.name.toLowerCase()} is burning. The dead are drifting toward it.`,'#e85');
+  chron(`A ${B.name.toLowerCase()} burned.`); miniDirty=true;
+  return true;
+}
+function distressFlare(){
+  const c=npcs.filter(n=>n.state==='wait'&&!n.met&&!n.flared); if(!c.length) return false;
+  const n=c[Math.floor(Math.random()*c.length)];
+  n.flared=true; n.poi.found=true; n.poi.hidden=false; miniDirty=true;
+  flares.push({x:n.x,y:n.y-8,t:70,pt:0,smoke:true}); SFX.hiss();
+  msg(`A flare climbs over ${DISTRICT_NAME[districtAt(Math.floor(n.x/TS),Math.floor(n.y/TS))]}. Someone is alive in there — and everything else saw it too.`,'#9cd');
+  chron('Someone fired a distress flare.');
+  return true;
+}
+function updateTownEvents(dt,h){
+  if(story.holdout>=0 && !story.cleared && !story.warned){   // you hear them before you see them
+    const B=buildings[story.holdout];
+    if(B && dist2(B.x+B.w/2,B.y+B.h/2,P.x/TS,P.y/TS)<10*10){
+      story.warned=true; const p=pois.find(q=>q.t==='holdout'); if(p){ p.found=true; p.hidden=false; } miniDirty=true;
+      msg(`Voices from the ${B.name.toLowerCase()} ahead. Living ones — and the sound of a round being chambered. They will shoot on sight.`,'#e88');
+      chron('Found where the marauders were holed up.');
+    }
+  }
+  if(flareDay<day && h>=evtHours.flare && h<20){ flareDay=day; distressFlare(); }
+  if(day>=2 && herdDay<day && h>=evtHours.herd && h<21){ herdDay=day; if(Math.random()<.8) startHerd(); }
+  if(day>=2 && fireDay<day && h>=evtHours.fire){ fireDay=day; if(Math.random()<.45) startBlaze(); }
+  if(herd){
+    herd.t-=dt; herd.ct-=dt;
+    if(herd.ct<=0){
+      herd.ct=1; let sx=0, sy=0, c=0;
+      for(const z of herd.zs) if(z.hp>0&&z.state==='invest'){ sx+=z.x; sy+=z.y; c++; }
+      if(c<4||herd.t<=0){ herd=null; miniDirty=true; } else { herd.x=sx/c/TS; herd.y=sy/c/TS; }
+    }
+  }
+  if(blaze){ blaze.t-=dt; if(blaze.t<=0){ const k=pois.indexOf(blaze.p); if(k>=0) pois.splice(k,1); blaze=null; miniDirty=true; } }
 }
 
 /* ================= RENDERING =================
@@ -3993,6 +4511,14 @@ function paintFx(c,f,px,py,i){
     case 'gate': rect('#17181a',0,10,32,12); rect('#4a525a',0,11,32,10); c.fillStyle='#d8b84a'; for(let j=0;j<4;j++){ c.beginPath(); c.moveTo(px+j*8,py+21); c.lineTo(px+j*8+4,py+11); c.lineTo(px+j*8+8,py+11); c.lineTo(px+j*8+4,py+21); c.closePath(); c.fill(); } rect('#17181a',0,10,32,1); rect('#17181a',0,21,32,1); break;
     case 'keypad': rect('#17181a',11,5,10,22); rect('#59616a',12,6,8,20); rect('#1c2a22',13,8,6,5); for(let j=0;j<6;j++) rect('#c9c4b4',13+(j%2)*4,15+((j/2)|0)*3,2,2); circ('#e85a4a',16,10,1.5); break;
     case 'beacon': circ('#17181a',16,16,12); circ('#a8342a',16,16,10.5); c.strokeStyle='rgba(0,0,0,.3)'; c.lineWidth=1; c.beginPath(); c.arc(px+16,py+16,7,0,6.2832); c.stroke(); rect('#e6e2d6',11,14,10,4); rect('#d8b84a',14,9,4,14); break;
+    case 'trader':   // the Peddler's armoured van, hatch open
+      rect('#17181a',2,3,28,5); rect('#17181a',2,24,28,5);
+      rect('#1e2420',1,6,30,20); rect('#4a5a44',2,7,28,18); rect('rgba(0,0,0,.2)',2,7,28,3); rect('rgba(0,0,0,.2)',2,22,28,3);
+      for(let j=0;j<4;j++) rect('#2a342a',5+j*6,8,1,16);
+      rect('#1c2730',23,10,5,12); rect('rgba(160,200,220,.2)',24,11,2,10);
+      rect('#17181a',9,12,10,8); rect('#e6c86e',10,13,8,6); rect('#3a2c1c',12,15,4,3);
+      circ('#e85a4a',6,10,1.5); circ('#e85a4a',6,22,1.5);
+      break;
     default: rect('#59616a',5,5,22,22);
   }
 }
@@ -4149,8 +4675,39 @@ function drawPlayer(px,py){
   if(hd){ c.fillStyle = hd.id==='hardhat'?'#c9a52a' : hd.id==='firehelm'?'#a8342a' : '#2a2c30'; c.beginPath(); c.arc(1.5,0,5.9,0,6.2832); c.fill(); c.fillStyle='rgba(255,255,255,.2)'; c.beginPath(); c.arc(0,-1.6,2.2,0,6.2832); c.fill(); }
   c.restore();
 }
+function drawPerson(px,py,o){   // survivors and marauders: the living
+  const c=cx;
+  c.save(); c.translate(px,py); c.globalAlpha=o.a;
+  c.fillStyle='rgba(0,0,0,.3)'; ell(c,2,3,11,9);
+  c.rotate(o.face); c.lineCap='round';
+  const st=o.moving?Math.sin(o.walk):0, skin=o.flash?'#f2ece0':o.skin, shirt=o.flash?'#e8e0d0':o.shirt;
+  c.fillStyle='#26221e'; ell(c,st*4.5,-5,4.5,3.2); ell(c,-st*4.5,5,4.5,3.2);
+  if(o.pack){ c.fillStyle='#4a4232'; c.fillRect(-12.5,-6.5,6.5,13); }
+  c.fillStyle=shirt; ell(c,0,0,6.6,10);
+  c.fillStyle='rgba(0,0,0,.16)'; ell(c,-2.2,0,3.6,8.8);
+  c.strokeStyle=skin; c.lineWidth=3.2;
+  if(o.gun){ seg(c,2,7,11,3.5); seg(c,2,-7,14,-1); c.fillStyle='#1c1e22'; c.fillRect(5,.5,21,3.4); c.fillStyle='#5a4026'; c.fillRect(3,0,7,4.4); }
+  else { const wa=o.swing>0?lerp(-.9,.9,1-o.swing/.15):.3; seg(c,1,-7,6,-6); c.save(); c.rotate(wa); seg(c,1,6,9,5); c.strokeStyle='#8f969c'; c.lineWidth=3; seg(c,8,5,23,5); c.restore(); }
+  c.fillStyle=skin; c.beginPath(); c.arc(1.5,0,5.2,0,6.2832); c.fill();
+  c.fillStyle=o.hair; c.beginPath(); c.arc(.6,0,5.2,1.9,4.38); c.fill();
+  if(o.mask){ c.fillStyle='#7a2a22'; c.fillRect(3.4,-4.2,2.4,8.4); }
+  c.restore();
+}
 function drawZombie(z,px,py,now){
   const c=cx, S=ZTYPE[z.kind]||ZTYPE.walker, s=z.rad/10, hit=z.flash>0;
+  if(S.human){
+    if(z.aimT>0 && z.vis>.3){   // the aim line: when it stops moving, the shot is coming
+      const lock=z.aimT<.15;
+      c.strokeStyle='rgba(255,60,50,'+(lock?.85:(.15+.4*(1-z.aimT/.85))).toFixed(2)+')'; c.lineWidth=lock?2.2:1.2;
+      c.beginPath(); c.moveTo(px+Math.cos(z.aimA)*14,py+Math.sin(z.aimA)*14); c.lineTo(px+Math.cos(z.aimA)*380,py+Math.sin(z.aimA)*380); c.stroke();
+    }
+    drawPerson(px,py,{a:z.vis,face:z.face,moving:z.state!=='idle'&&!(z.aimT>0),walk:now/90+z.ph,skin:z.skin,shirt:z.shirt,hair:'#1a1a1c',gun:true,mask:true,flash:hit});
+    if(z.vis>.5){
+      if(z.hp<z.maxhp){ c.fillStyle='rgba(0,0,0,.5)'; c.fillRect(px-11,py-z.rad-9,22,3); c.fillStyle='#c98a3a'; c.fillRect(px-11,py-z.rad-9,22*clamp(z.hp/z.maxhp,0,1),3); }
+      c.font='bold 9px "Courier New", monospace'; c.textAlign='center'; c.textBaseline='alphabetic'; c.fillStyle='#e0a070'; c.fillText('MARAUDER',px,py-z.rad-12);
+    }
+    return;
+  }
   const skin=hit?'#f2ece0':z.skin, shirt=hit?'#e8e0d0':z.shirt;
   c.save(); c.translate(px,py); c.globalAlpha=z.vis;
   if(z.elite||S.boss){   // champions wear a ring
@@ -4311,6 +4868,7 @@ function draw(dt){
   if(it){
     cx.strokeStyle='rgba(230,200,110,.8)'; cx.lineWidth=2;
     if(it.kind==='ground'){ const g=groundItems[it.gi]; if(g){ cx.beginPath(); cx.arc(g.x+ox,g.y+oy,13,0,7); cx.stroke(); } }
+    else if(it.kind==='npc'){ cx.beginPath(); cx.arc(it.n.x+ox,it.n.y+oy,15,0,7); cx.stroke(); }
     else { const tx=it.i%MW, ty=Math.floor(it.i/MW); cx.strokeRect(tx*TS+ox+2,ty*TS+oy+2,TS-4,TS-4); }
   }
   if(bd && bd.i!=null && !(it && it.i===bd.i)){
@@ -4341,6 +4899,22 @@ function draw(dt){
       z.vis=clamp(z.vis+(can?1:-1)*dt*(can?7:4),0,1);
     }
     if(z.vis>.02) drawZombie(z,z.x+ox,z.y+oy,now);
+  }
+  // the living: survivors you have found, or who are following you
+  for(const n of npcs){
+    if(n.state==='dead') continue;
+    if(!onScr(n.x,n.y,40)){ n.vis=0; continue; }
+    const can=dist2(n.x,n.y,P.x,P.y)<visR*visR && !losBlocked(P.x,P.y,n.x,n.y);
+    n.vis=clamp(n.vis+(can?1:-1)*dt*6,0,1);
+    if(n.vis<.02) continue;
+    const px=n.x+ox, py=n.y+oy;
+    if(n.state==='follow'){ cx.strokeStyle='rgba(140,200,230,'+(.55*n.vis).toFixed(2)+')'; cx.lineWidth=1.5; cx.beginPath(); cx.arc(px,py,14,0,7); cx.stroke(); }
+    drawPerson(px,py,{a:n.vis,face:n.face,moving:n.moving,walk:n.walkPh,skin:n.skin,shirt:n.shirt,hair:n.hair,gun:n.role==='hunter',swing:n.swingT,pack:n.role==='scavenger'});
+    if(n.vis>.5){
+      cx.font='bold 9px "Courier New", monospace'; cx.textAlign='center'; cx.textBaseline='alphabetic';
+      cx.fillStyle='rgba(0,0,0,.7)'; cx.fillText(n.met?n.name.toUpperCase():'?',px+1,py-17); cx.fillStyle='#9cd0e6'; cx.fillText(n.met?n.name.toUpperCase():'?',px,py-18);
+      if(n.hp<n.maxhp-1){ cx.fillStyle='rgba(0,0,0,.5)'; cx.fillRect(px-11,py-15,22,3); cx.fillStyle='#5aa0c0'; cx.fillRect(px-11,py-15,22*clamp(n.hp/n.maxhp,0,1),3); }
+    }
   }
   // spitter globs
   for(const s of shots){ cx.fillStyle='rgba(170,215,60,.9)'; cx.beginPath(); cx.arc(s.x+ox,s.y+oy,5,0,7); cx.fill(); cx.fillStyle='rgba(230,255,160,.8)'; cx.beginPath(); cx.arc(s.x+ox-1,s.y+oy-1,2,0,7); cx.fill(); }
@@ -4395,7 +4969,7 @@ function draw(dt){
   if(df>.4){
     for(const z of zombies){
       if(z.vis<.5 || z.down>0) continue; const S=ZTYPE[z.kind]||ZTYPE.walker;
-      if(!(S.night||S.boss||z.state==='chase')) continue;
+      if(S.human||!(S.night||S.boss||z.state==='chase')) continue;
       const ex=z.x+ox+Math.cos(z.face)*z.rad*.55, ey=z.y+oy+Math.sin(z.face)*z.rad*.55, nx=-Math.sin(z.face)*2.4, ny=Math.cos(z.face)*2.4;
       cx.fillStyle=(S.night||S.boss)?'#ff5a4a':'#e03a2a'; cx.fillRect(ex+nx-1,ey+ny-1,2,2); cx.fillRect(ex-nx-1,ey-ny-1,2,2);
     }
@@ -4491,7 +5065,8 @@ function syncHUD(){
   if(_hc.boss!==bb){ _hc.boss=bb; $('bossBar').style.display=bb?'block':'none'; $('hud').classList.toggle('boss',!!bb); }
   if(bb){ setT('bossName',boss.name||'THE ALPHA'); setW('bossF',clamp(boss.hp/boss.maxhp*100,0,100)); }
   const o=objective();
-  setH('obj',o?`<div class="ot">◆ ${esc(o.t)}</div>`+(o.s?`<div class="os">${esc(o.s).replace(/\n/g,'<br>')}</div>`:''):'');
+  let fh=''; for(const n of npcs) if(n.state==='follow') fh+=`<div class="of">${ROLES[n.role].ico} ${esc(n.name)} · ${Math.round(n.hp/n.maxhp*100)}%</div>`;
+  setH('obj',(o?`<div class="ot">◆ ${esc(o.t)}</div>`+(o.s?`<div class="os">${esc(o.s).replace(/\n/g,'<br>')}</div>`:''):'')+fh);
   if(hudDirty||frameNo%15===0){ syncWeaponHud(); hudDirty=false; }
 }
 function syncWeaponHud(){
@@ -4525,7 +5100,7 @@ function syncWeaponHud(){
 const bagEl=$('bag');
 let bagTab='pack';
 function toggleBag(){
-  if(state!=='play'||perkOpen||noteOpen||pauseOpen) return;
+  if(state!=='play'||perkOpen||noteOpen||pauseOpen||talkOpen||tradeOpen) return;
   paused=!paused;
   bagEl.style.display=paused?'flex':'none';
   if(paused){ syncBag(); hintOnce('craft'); } else saveGame();
@@ -4583,7 +5158,7 @@ function renderPack(list){
   const inSafe=isInSafehouse();
   P.inv.forEach((r,i)=>{
     const d=ITEMS[r.id], row=el('div','item');
-    const act=(d.t==='weapon'||d.t==='gun'||d.t==='armor'||d.t==='bag')?'EQUIP' : d.t==='throw'?'THROW' : d.t==='place'?'SET' : (d.t==='food'||d.t==='drink'||d.t==='med'||r.id==='battery'||r.id==='repairkit'||r.id==='patchkit')?'USE':'INFO';
+    const act=(d.t==='weapon'||d.t==='gun'||d.t==='armor'||d.t==='bag')?'EQUIP' : d.t==='throw'?'THROW' : d.t==='place'?'SET' : (d.t==='food'||d.t==='drink'||d.t==='med'||r.id==='battery'||r.id==='repairkit'||r.id==='patchkit'||r.id==='townmap')?'USE':'INFO';
     let bar='';
     if(d.t==='armor') bar=barHtml(r.cond/astats(r).condMax*100);
     else if(d.t==='weapon'){ const w=wstats(r); bar=barHtml(w.unbreak?100:r.dur/w.durMax*100); }
@@ -4644,6 +5219,18 @@ function renderJournal(list){
     for(const id of got) row.appendChild(btn('use',String(+id.split(':')[1]+1),()=>openNote(id)));
     list.appendChild(row);
   }
+  const known=npcs.filter(n=>n.met||n.poi.found);
+  if(known.length||story.metTrader){
+    list.appendChild(el('div','secHdr','PEOPLE'));
+    for(const n of known){
+      const status=n.state==='dead'?'dead':n.state==='follow'?'with you':n.state==='home'?'at the safehouse':n.met?(n.needDone?'waiting where you left them':'needs '+NEEDS[n.need].label):'signalled — not reached yet';
+      const row=el('div','item'+(n.state==='follow'?' equipped':''));
+      row.innerHTML=`<div class="iico">${ROLES[n.role].ico}</div><div class="inm"${n.state==='dead'?' style="color:#6d675a;text-decoration:line-through"':''}>${esc(n.name)} — ${ROLES[n.role].n} · ${status} <small>${esc(ROLES[n.role].perk)}</small></div>`;
+      if(n.state==='follow') row.appendChild(btn('use','TALK',()=>{ toggleBag(); talkTo(n); }));
+      list.appendChild(row);
+    }
+    if(story.metTrader) list.appendChild(el('div','jline',`🚐 The Peddler — you have ${story.credit} credit with him<small>Buys almost anything. His stock changes every morning.</small>`));
+  }
   list.appendChild(el('div','secHdr','YOUR STORY SO FAR'));
   for(let i=chronicle.length-1;i>=0;i--){ const c=chronicle[i]; list.appendChild(el('div','chron',`<b>Day ${c.d} · ${c.t}</b> — ${esc(c.s)}`)); }
 }
@@ -4663,7 +5250,7 @@ function renderSelf(list){
   }
   list.appendChild(sg);
   list.appendChild(el('div','secHdr','THIS RUN'));
-  list.appendChild(el('div','jline',`Day ${day} · ${kills} destroyed · ${run.looted} containers searched · ${run.crafted} crafted · ${run.boards} boards nailed · threat ${threat().toFixed(1)}`));
+  list.appendChild(el('div','jline',`Day ${day} · ${kills} destroyed · ${run.looted} containers searched · ${run.crafted} crafted · ${run.boards} boards nailed · threat ${threat().toFixed(1)}`+(run.mods&&run.mods.length?'<br>'+run.mods.map(id=>MODS[id].ico+' '+esc(MODS[id].n)).join(' · ')+' — score ×'+modMult().toFixed(2):'')+(run.daily?'<br>Daily run · '+esc(run.daily):'')));
   const pb=el('button','bigBtn','⚙ PAUSE MENU — settings · save & quit'); pb.addEventListener('click',()=>{ toggleBag(); openPause(); }); list.appendChild(pb);
 }
 
@@ -4703,7 +5290,7 @@ function openNote(id){
 function closeNote(){ noteOpen=false; $('noteScreen').style.display='none'; if(paused) syncBag(); }
 $('noteClose').addEventListener('click',closeNote);
 function openPause(){
-  if(state!=='play'||perkOpen) return;
+  if(state!=='play'||perkOpen||talkOpen||tradeOpen) return;
   pauseOpen=true; $('pauseSeed').textContent=`SEED ${SEED} · DAY ${day} · ${ROUTE_NAME[story.route].toUpperCase()}`;
   $('volRange').value=Math.round(META.set.vol*100); syncSettings();
   $('pauseScreen').style.display='flex';
@@ -4720,15 +5307,15 @@ $('shakeBtn').addEventListener('click',()=>{ META.set.shake=!META.set.shake; syn
 $('dmgBtn').addEventListener('click',()=>{ META.set.dmg=!META.set.dmg; syncSettings(); });
 $('quitBtn').addEventListener('click',async()=>{ await saveGame(); closePause(); showMenu(); });
 function hideOverlays(){
-  paused=false; mapOpen=false; perkOpen=false; noteOpen=false; pauseOpen=false;
-  for(const id of ['bag','mapScreen','perkScreen','noteScreen','pauseScreen','paused']) $(id).style.display='none';
+  paused=false; mapOpen=false; perkOpen=false; noteOpen=false; pauseOpen=false; talkOpen=false; tradeOpen=false;
+  for(const id of ['bag','mapScreen','perkScreen','noteScreen','pauseScreen','paused','talkScreen','tradeScreen']) $(id).style.display='none';
 }
 
 /* ================= MINIMAP ================= */
 const miniBuf=document.createElement('canvas'); miniBuf.width=MW; miniBuf.height=MH;
 const mbx=miniBuf.getContext('2d');
 let miniTick=0, mapOpen=false, saveT=25, savedGame=null;
-const POI_ICO={police:'🚓',hospital:'🏥',supermarket:'🛒',school:'🏫',church:'⛪',firestation:'🚒',garage:'🚚',gas:'⛽',tower:'📡',checkpoint:'🚧',lz:'🚁',park:'🌳',wreck:'💥',airdrop:'📦',stash:'✚',market:'🛒',hardware:'🔧',clinic:'➕',gunshop:'🔫',warehouse:'🏭'};
+const POI_ICO={trader:'🚐',survivor:'🧑',holdout:'☠️',fire:'🔥',police:'🚓',hospital:'🏥',supermarket:'🛒',school:'🏫',church:'⛪',firestation:'🚒',garage:'🚚',gas:'⛽',tower:'📡',checkpoint:'🚧',lz:'🚁',park:'🌳',wreck:'💥',airdrop:'📦',stash:'✚',market:'🛒',hardware:'🔧',clinic:'➕',gunshop:'🔫',warehouse:'🏭'};
 function buildMiniBuf(){
   if(!explored) return;
   const img=mbx.createImageData(MW,MH), d=img.data;
@@ -4775,6 +5362,7 @@ function drawMapTo(c,cw,ch,big){
   if(o) for(const m of o.marks){ const x=m.x*sxr, y=m.y*syr, s=(big?8:4.5)+Math.sin(now/260)*(big?1.5:1);
     c.fillStyle='#e6c86e'; c.strokeStyle='rgba(0,0,0,.7)'; c.lineWidth=1; c.beginPath(); c.moveTo(x,y-s); c.lineTo(x+s,y); c.lineTo(x,y+s); c.lineTo(x-s,y); c.closePath(); c.fill(); c.stroke(); }
   if(waypoint){ c.fillStyle='#7fb4e0'; c.strokeStyle='rgba(0,0,0,.7)'; c.beginPath(); c.arc(waypoint.x*sxr,waypoint.y*syr,big?6:3,0,7); c.fill(); c.stroke(); }
+  if(herd){ c.fillStyle='rgba(232,90,74,.8)'; c.beginPath(); c.arc(herd.x*sxr,herd.y*syr,(big?10:4.5)+Math.sin(now/200),0,7); c.fill(); if(big){ c.fillStyle='#fff'; c.fillText('🧟',herd.x*sxr,herd.y*syr+1); } }
   if(boss&&boss.hp>0&&big){ c.fillStyle='#e85a4a'; c.beginPath(); c.arc(boss.x/TS*sxr,boss.y/TS*syr,5,0,7); c.fill(); }
   const pxx=(P.x/TS)*sxr, pyy=(P.y/TS)*syr;
   c.strokeStyle='#fff'; c.lineWidth=big?2:1.5;
@@ -4796,7 +5384,7 @@ const mapCanvas=$('mapCanvas'), mpx=mapCanvas.getContext('2d');
 let _mapS=0;
 function drawBigMap(){ mpx.setTransform(DPR,0,0,DPR,0,0); drawMapTo(mpx,_mapS,_mapS,true); }
 function openMap(){
-  if(state!=='play'||perkOpen||noteOpen||pauseOpen) return;
+  if(state!=='play'||perkOpen||noteOpen||pauseOpen||talkOpen||tradeOpen) return;
   mapOpen=true;
   $('mapSeed').textContent='SEED '+SEED+' · '+DISTRICT_NAME[districtAt(Math.floor(P.x/TS),Math.floor(P.y/TS))].toUpperCase();
   $('mapScreen').style.display='flex';
@@ -4868,6 +5456,8 @@ window.addEventListener('keydown',e=>{
   if(perkOpen){ if(k==='1'||k==='2'||k==='3'){ const c=perkChoices[+k-1]; if(c) choosePerk(c); } e.preventDefault(); return; }
   if(noteOpen){ if(!e.repeat&&(k==='escape'||k==='e'||k===' '||k==='enter')) closeNote(); e.preventDefault(); return; }
   if(pauseOpen){ if(k==='escape'||k==='p') closePause(); return; }
+  if(talkOpen){ if(!e.repeat){ if(k==='escape') closeTalk(); else if(k>='1'&&k<='9'){ const o=talkOpts[+k-1]; if(o&&o[1]) o[1](); } } e.preventDefault(); return; }
+  if(tradeOpen){ if(k==='escape'||k==='e') { if(!e.repeat) closeTrade(); } return; }
   if(mapOpen){ if(k==='m'||k==='escape') closeMap(); return; }
   if(paused){
     if(k==='escape'||k==='tab'||k==='i'||k==='b'){ if(!e.repeat) toggleBag(); e.preventDefault(); }
@@ -4932,7 +5522,7 @@ cv.addEventListener('mousedown',e=>{
 window.addEventListener('mouseup',()=>{ atkHeld=false; });
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 let _wheelT=0;
-window.addEventListener('wheel',e=>{ if(state!=='play'||paused||mapOpen||perkOpen||noteOpen||pauseOpen) return; const n=performance.now(); if(n-_wheelT<180) return; _wheelT=n; swapWeapon(); },{passive:true});
+window.addEventListener('wheel',e=>{ if(state!=='play'||paused||mapOpen||perkOpen||noteOpen||pauseOpen||talkOpen||tradeOpen) return; const n=performance.now(); if(n-_wheelT<180) return; _wheelT=n; swapWeapon(); },{passive:true});
 $('hb1').addEventListener('click',()=>swapWeapon(0)); $('hb2').addEventListener('click',()=>swapWeapon(1));
 $('hb3').addEventListener('click',quickHeal); $('hb4').addEventListener('click',quickThrow); $('hb5').addEventListener('click',toggleFlash);
 
@@ -4943,6 +5533,7 @@ $('hb3').addEventListener('click',quickHeal); $('hb4').addEventListener('click',
 let gpPrev=[], gpNavT=0, gpFocus=null;
 function uiRoot(){
   if(perkOpen) return $('perkScreen'); if(noteOpen) return $('noteScreen'); if(pauseOpen) return $('pauseScreen');
+  if(talkOpen) return $('talkScreen'); if(tradeOpen) return $('tradeScreen');
   if(mapOpen) return $('mapScreen'); if(paused) return bagEl;
   if(state==='play') return null;
   for(const id of ['originScreen','dead','win','menu']){ const e=$(id); if(getComputedStyle(e).display!=='none') return e; }   // (fixed elements have no offsetParent)
@@ -4958,7 +5549,7 @@ function padNav(root,dir,press,back,tabDir){
   if(tabDir && root===bagEl){ const tabs=['pack','craft','journal','self']; setTab(tabs[(tabs.indexOf(bagTab)+tabDir+4)%4]); gpFocus=null; }
   if(press && gpFocus){ gpFocus.click(); }
   if(back){
-    if(noteOpen) closeNote(); else if(pauseOpen) closePause(); else if(mapOpen) closeMap(); else if(paused) toggleBag();
+    if(talkOpen) closeTalk(); else if(tradeOpen) closeTrade(); else if(noteOpen) closeNote(); else if(pauseOpen) closePause(); else if(mapOpen) closeMap(); else if(paused) toggleBag();
     else if(root.id==='originScreen') showMenu();
   }
 }
@@ -5003,7 +5594,7 @@ function loop(t){
   requestAnimationFrame(loop);
   const raw=Math.min(.05,(t-lastT)/1000)||0; lastT=t;
   pollPad(raw);
-  const playing = state==='play' && !paused && !mapOpen && !perkOpen && !noteOpen && !pauseOpen && !portrait;
+  const playing = state==='play' && !paused && !mapOpen && !perkOpen && !noteOpen && !pauseOpen && !talkOpen && !tradeOpen && !portrait;
   if(playing){
     if(pendingPerks>0) openPerkDraft();
     else if(hitStop>0) hitStop-=raw;                       // a few frozen frames sell the impact
@@ -5014,6 +5605,7 @@ function loop(t){
       if(atkHeld) doAttack();
       updatePlayer(dt);
       if(state==='play'){ updateFlow(dt); updateZombies(dt); }
+      if(state==='play') updateNpcs(dt);
       if(state==='play'){
         processNoises();
         updateSpawns(dt);
@@ -5069,7 +5661,8 @@ function serialize(){
     ground:groundItems, traps, weather, weatherT, weatherStrength,
     doorsOpen:[...doorOpen], doorHp:[...doorHp], tiles:[...dirtyTiles], barricades:[...barricades],
     safehouse, stash, respawnMode, siegeArmed, looted, left, dyn,
-    story:{step:story.step,have:story.have,notes:story.notes,hold:story.hold},
+    story:{step:story.step,have:story.have,notes:story.notes,hold:story.hold,credit:story.credit,sold:story.sold,cleared:story.cleared,mapSold:story.mapSold,metTrader:story.metTrader,warned:story.warned},
+    npcs:npcs.map(n=>({s:n.state,x:n.x,y:n.y,hp:n.hp,met:n.met,nd:n.needDone,u:n.used,fl:n.flared,st:n.settled,c:n.called})), herdDay, fireDay, flareDay,
     pois:found, dynPois:pois.filter(p=>p.t==='airdrop'),
     chron:chronicle, run, power, alphaDay, dropDay, pendingPerks, waypoint,
     explored:packExplored(),
@@ -5087,6 +5680,8 @@ function resetRunState(){
   weather='clear'; weatherStrength=0; weatherT=90; lightning=0; curDistrict='';
   chronicle=[]; run={looted:0,crafted:0,boards:0,dmg:0,alpha:0,elites:0};
   power=true; heli=null; boss=null; pendingPerks=0; alphaDay=0; dropDay=0; heliDay=0;
+  npcs=[]; herd=null; blaze=null; _stock=null; herdDay=0; fireDay=0; flareDay=0; talkOpen=false; tradeOpen=false;
+  evtHours={herd:8+Math.random()*10,fire:9+Math.random()*12,flare:10+Math.random()*4};
   hinted={}; hintI=0; hintT=1.2; spawnT=14; hordeArmed=true; beatT=0; groanT=6;
   waypoint=null; miniDirty=true; flowDirty=true; flowT=0; flowPI=-1; flow.fill(65535);
   dirtyTiles=new Map(); bagSort=null; bagTab='pack';
@@ -5095,12 +5690,14 @@ function resetRunState(){
 }
 function newRun(originId){
   resetRunState();
+  run.mods=pendingMods.slice(); run.daily=dailyKey;
   day=1; gameMin=8*60; kills=0;
   curRng=mulberry32(SEED>>>0);        // ---- deterministic section: the same seed is the same town and the same story ----
   genMap();
   pickStartHouse();
   const hadFurniture=assignStarterLoot(originId);
   buildStory();
+  genTown();                          // people, on their own random stream
   const sb=buildings[startHouseIdx], sp=safeSpawnInHouse(sb), O=ORIGINS[originId]||ORIGINS.drifter;
   P=freshPlayer(sp.x,sp.y); P.origin=originId;
   for(const k in O.perks) P.perks[k]=O.perks[k];
@@ -5109,6 +5706,9 @@ function newRun(originId){
   spawnInitialZombies();              // the initial horde layout is part of the seed
   curRng=Math.random;                 // ---- gameplay is non-deterministic ----
   explored=new Uint8Array(MW*MH);
+  if(mod('dark')) power=false;
+  if(originId==='dispatcher') for(const n of npcs){ n.poi.found=true; n.poi.hidden=false; }          // you know where they went to ground
+  if(originId==='smuggler'){ story.credit=40; const tp=pois.find(p=>p.t==='trader'); if(tp) tp.found=true; }
   if(!hadFurniture){ for(const id of O.kit) addItem(id); story.notes.push('start'); story.step=1; }   // never wake truly empty-handed
   chron(`Woke in a house in ${DISTRICT_NAME[districtAt(sb.x+1,sb.y+1)]}. ${O.n}.`);
   updateCam(0,true);
@@ -5120,7 +5720,7 @@ function applySave(s){
   day=s.day||1; gameMin=(s.gameMin!=null?s.gameMin:480); kills=s.kills||0;
   const origin=(s.p&&s.p.origin&&ORIGINS[s.p.origin])?s.p.origin:'drifter';
   curRng=mulberry32(SEED);            // rebuild the exact town and story from the seed
-  genMap(); pickStartHouse(); assignStarterLoot(origin); buildStory();
+  genMap(); pickStartHouse(); assignStarterLoot(origin); buildStory(); genTown();
   curRng=Math.random;
   doorOpen=new Set(s.doorsOpen||[]);
   doorHp=new Map(s.doorHp||[]);
@@ -5135,6 +5735,11 @@ function applySave(s){
   rebuildBlk();
   const ss=s.story||{};
   story.step=ss.step||0; story.have=ss.have||{}; story.notes=ss.notes||[]; story.hold=ss.hold||null;
+  story.credit=ss.credit||0; story.sold=ss.sold||null; story.cleared=!!ss.cleared; story.mapSold=!!ss.mapSold; story.metTrader=!!ss.metTrader; story.warned=!!ss.warned;
+  (s.npcs||[]).forEach((d,k)=>{ const n=npcs[k]; if(!n) return; n.state=d.s||'wait'; n.x=d.x; n.y=d.y; n.lx=d.x; n.ly=d.y; n.hp=d.hp; n.met=!!d.met; n.needDone=!!d.nd; n.used=d.u||0; n.flared=!!d.fl; n.settled=!!d.st; n.called=!!d.c;
+    n.poi.x=n.x/TS; n.poi.y=n.y/TS; if(n.met||n.flared){ n.poi.hidden=false; } if(n.state==='dead') n.poi.n=n.name+' (dead)'; });
+  if(story.cleared){ const hp=pois.find(p=>p.t==='holdout'); if(hp){ hp.n='Holdout (cleared)'; hp.hidden=false; } }
+  herdDay=s.herdDay||0; fireDay=s.fireDay||0; flareDay=s.flareDay||0;
   for(const c of conts.values()){ if(c.key&&story.have[c.key]) c.key=null; if(c.note&&story.notes.includes(c.note)) c.note=null; }
   for(const k of (s.pois||[])) if(pois[k]) pois[k].found=true;
   for(const p of (s.dynPois||[])) if(conts.has(p.i)&&!conts.get(p.i).looted) pois.push(p);
@@ -5176,6 +5781,7 @@ async function refreshMenu(){
   if(savedGame){ c.style.display='block'; $('contInfo').textContent='DAY '+savedGame.day+' · '+savedGame.kills+' KILLED'; if(savedGame.respawnMode!=null) respawnMode=!!savedGame.respawnMode; }
   else c.style.display='none';
   updateRespawnToggle();
+  { const tk=todayKey(), d=META.daily&&META.daily[tk]; $('dailyBtn').textContent='DAILY RUN · '+tk+(d?` · BEST ${d.score}${d.won?' ✓':''}`:''); }
   const n=Object.keys(ORIGINS).filter(originUnlocked).length;
   $('metaLine').textContent = META.runs ? `RUNS ${META.runs} · ESCAPES ${META.wins||0} · BEST ${(META.bestDays||0).toFixed(1)} DAYS · BEST SCORE ${META.bestScore||0} · ORIGINS ${n}/${Object.keys(ORIGINS).length}` : '';
 }
@@ -5195,12 +5801,29 @@ function showOrigins(){          // NEW RUN: first choose who you were
     if(open) c.addEventListener('click',()=>{ audio(); startGame(id); }); else c.disabled=true;
     box.appendChild(c);
   }
+  // run modifiers: optional, stackable, each one multiplies the score (the daily run fixes its own)
+  const mr=$('modRow'); mr.innerHTML='';
+  const info=()=>{ const m=1+pendingMods.reduce((a,id)=>a+MODS[id].x,0); $('modInfo').textContent=(dailyKey?`DAILY RUN · ${dailyKey} · the same town for everyone today. `:'')+(pendingMods.length?pendingMods.map(id=>MODS[id].d).join(' ')+` Score ×${m.toFixed(2)}.`:'No modifiers. Score ×1.00.'); };
+  for(const id in MODS){
+    const M=MODS[id], b=el('button','mchip'+(pendingMods.includes(id)?' on':''),`${M.ico} ${esc(M.n.toUpperCase())} +${Math.round(M.x*100)}%`);
+    if(dailyKey) b.disabled=true;
+    else b.addEventListener('click',()=>{ const k=pendingMods.indexOf(id); if(k>=0) pendingMods.splice(k,1); else pendingMods.push(id); b.classList.toggle('on',k<0); SFX.click(); info(); });
+    mr.appendChild(b);
+  }
+  info();
+  $('originSub').textContent=dailyKey?'TODAY\'S TOWN — CHOOSE WHO WALKS INTO IT':'IT DECIDES WHAT YOU WAKE UP WITH';
   hideScreens();
   $('originScreen').style.display='flex';
 }
+function startDaily(){           // one seed per calendar day, with one modifier drawn from it
+  dailyKey=todayKey();
+  const r=mulberry32(hashSeed('deadfall-daily-'+dailyKey)), ids=Object.keys(MODS);
+  pendingMods=[ids[Math.floor(r()*ids.length)]];
+  showOrigins();
+}
 function startGame(originId){    // reads the seed field; random if blank
   lastOrigin=originId||lastOrigin;
-  SEED=seedFromInput();
+  SEED=dailyKey?hashSeed('deadfall-daily-'+dailyKey):seedFromInput();
   hideScreens();
   newRun(lastOrigin);
   state='play'; saveT=25; syncAtkGlyph();
@@ -5218,10 +5841,12 @@ function tapBtn(id,fn){
   const e=$(id); if(!e) return;
   e.addEventListener('click',()=>{ audio(); fn(); });
 }
-tapBtn('newBtn',showOrigins);
+tapBtn('newBtn',()=>{ if(dailyKey){ dailyKey=''; pendingMods=[]; } showOrigins(); });
+tapBtn('dailyBtn',startDaily);
+$('tradeClose').addEventListener('click',closeTrade);
 tapBtn('continueBtn',continueGame);
 tapBtn('originBack',showMenu);
-const _again=()=>{ const si=$('seedInput'); if(si) si.value=''; showOrigins(); };
+const _again=()=>{ const si=$('seedInput'); if(si) si.value=''; if(dailyKey){ dailyKey=''; pendingMods=[]; } showOrigins(); };
 tapBtn('retryBtn',_again); tapBtn('winRetryBtn',_again);
 tapBtn('menuBtn',showMenu); tapBtn('winMenuBtn',showMenu);
 $('rerollBtn').addEventListener('click',()=>{ const si=$('seedInput'); if(si) si.value=String((Math.random()*4294967296)>>>0); });

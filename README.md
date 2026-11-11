@@ -6,7 +6,7 @@ A single-file, top-down survival-horror roguelite. The town of Deadfall fell in 
 
 ## The run
 
-1. **Choose who you were.** Ten origins (three open, seven earned) set your starting kit, skills and first perk.
+1. **Choose who you were.** Twelve origins (three open, nine earned) set your starting kit, skills and first perk.
 2. **Wake up, search the house.** A note tells you which way out this town has:
    - **The Signal** — power the radio tower, broadcast, and hold the school field for the helicopter.
    - **The Long Road** — find a battery, fuel and the keys for the tow truck at the garage (the keys are on a man who didn't make it).
@@ -15,6 +15,8 @@ A single-file, top-down survival-horror roguelite. The town of Deadfall fell in 
 4. **Get out** — or don't. Either way the end screen reads your run back to you, scores it, and unlocks what you earned.
 
 The town gets worse the longer you stay: tougher dead, elite variants, the power failing on day 3, and an Alpha that starts hunting you by night.
+
+You are not the only one left. Survivors are hiding in the town, a trader works out of an armoured van, and one building belongs to people who will shoot you for your pack.
 
 ## Controls
 
@@ -52,7 +54,12 @@ Left stick move · right stick aim · `RT` attack · `A` use · `B` dodge · `X`
 - **Combat.** Melee arcs with knockdown, crits, cleave and hit-stop; firearms with magazines, reloads, spread and noise (pistol, revolver, SMG, shotgun, rifle, crossbow). Dodge through lunges and charges. Brutes charge and stun themselves on walls; spitters lob acid; screamers call the horde; bloaters burst into gas.
 - **Loot.** Five quality tiers (Worn → Legendary), rolled affixes (*Serrated*, *Suppressed*, *Bite-proof*…) and ten named uniques. Better tiers in more dangerous places; safes need a lockpick, a crowbar or a sledge. The dead drop things. Supply drops fall from day 2.
 - **Crafting.** Rags, tape, scrap, nails, powder and parts become bandages, molotovs, pipe bombs, noisemakers, spike traps, ammunition and repair kits. Some recipes need a workbench (hardware stores, garages, or your own).
-- **Progression.** Skills grow with use; character levels grant a **perk draft** (pick 1 of 3, 23 perks). Meta-progression unlocks new origins across runs.
+- **Progression.** Skills grow with use; character levels grant a **perk draft** (pick 1 of 3, 25 perks). Meta-progression unlocks new origins across runs.
+- **Survivors.** Three or four people are hiding in every town — some call out as you pass, some fire a distress flare. Help them (a few need water, food or a bandage first), then take one along as a fighting companion or settle them at your safehouse, where each role earns its keep: the **medic** patches you up, the **mechanic** repairs your weapon and counts as a workbench, the **lookout** weakens sieges, the **cook**, **hunter** and **scavenger** stock the stash every morning. Survivors who are with you or at home when you escape leave with you.
+- **The Peddler.** An armoured van parked somewhere in town buys almost anything and sells ammunition, medicine, gear, a town map and tips. His stock changes every morning.
+- **Marauders.** One building is held by armed people. They aim before they fire — break line of sight or dodge the shot — and they are sitting on military-grade loot.
+- **Town events.** Herds migrate along the main roads (tracked on your map), buildings catch fire and pull the dead toward the smoke, and survivors send up flares.
+- **Run modifiers & the Daily Run.** Five optional modifiers (*The Swarm*, *Lean Times*, *The Long Dark*, *Glass Bones*, *Hunted*) stack for a higher score multiplier. The **Daily Run** gives everyone the same town and modifier for the day and keeps your best score.
 - **Safehouse.** Claim a building, barricade it, stash gear, rest until dawn — and survive the siege. Build stations: workbench, cot, rain collector, tripwire alarm. Optional **safehouse respawn** (off by default; permadeath is the default).
 - **Story.** Lore threads scattered through the right buildings; finish one and a hidden cache appears on your map. The journal tracks objectives, notes and a chronicle of the run.
 - Your run auto-saves; **Continue** resumes it from the menu. See [ROADMAP.md](ROADMAP.md) for what's next.

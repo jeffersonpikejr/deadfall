@@ -44,23 +44,36 @@ Ships the old candidates **B (crafting)** and **C (objectives & narrative)**, pl
 
 ---
 
-## 🔜 Phase 6 — candidate directions (pick one to focus)
+## ✅ Phase 6 — The Living Town (2026-11-11)
+Ships candidate **D (living town)** and **G (run modifiers & daily seed)**. Everything new is generated on its own random stream, so existing seeds build the same streets, story and opening horde as before, and Phase 5 saves keep loading (schema stays v4).
 
-**D. Living town / factions** — other survivors (trade, recruit, or rob), a wandering trader, rival scavengers who strip buildings before you, dynamic events (a horde migrates, a building burns). The largest remaining gap: the town is still empty of people.
+- **Survivors** — three or four per town, each hiding in a different building with a name, a role and sometimes a need (water, food, a bandage, painkillers). They call out when you pass and send up distress flares. One can follow you as a companion: they path with the same flow field the dead use, open doors, fight what gets close (the hunter shoots — loudly) and catch up if they fall behind. Settle them at the safehouse for a standing bonus: **medic** (daily patch-up; resting stops bleeding and sets bones), **mechanic** (daily weapon repair; counts as a workbench), **lookout** (weaker sieges), **cook**, **hunter**, **scavenger** (daily deliveries to the stash). They can die. Those with you or at home when you escape count toward your score and the ending.
+- **The Peddler** — an armoured van that buys anything in your pack and sells ammunition, medicine, quality gear, a town map and tips on where people are hiding. Stock is rolled per day from the seed; prices follow item quality and condition.
+- **Marauders** — three armed humans hold one building over a military crate. They aim (a visible line), commit, then fire; breaking line of sight or dodging beats the shot. You are warned before you walk in. Clearing them is optional and pays.
+- **Town events** — herds that march the length of a main road (shown on the map), building fires that draw the dead, and survivor flares.
+- **Run modifiers** — five stackable toggles on the origin screen, each raising the score multiplier: The Swarm, Lean Times, The Long Dark, Glass Bones, Hunted.
+- **Daily Run** — one seed and one modifier per calendar day, with your best score for the day kept on the menu.
+- **Also** — two new origins (Dispatcher, Smuggler) and two perks (Shepherd, Silver Tongue) tied to the new systems; two new items (adrenaline shot, town map); a People section in the journal.
 
-**E2. Safehouse network** — claim **multiple** safehouses and **fast-travel** between them when the coast is clear; sieges that probe your weakest wall; more stations (garden, radio, watch post).
+---
 
-**F. More ways out** — a fourth and fifth route (the river and a boat; the hospital roof), route-specific bosses, and branching objectives so two runs on the same route still differ.
+## 🔜 Phase 7 — candidate directions (pick one to focus)
 
-**G. Run modifiers & daily seed** — optional mutators (permanent night, no guns, fast dead), difficulty tiers, a daily seed with a local leaderboard.
+**E2. Safehouse network** — claim **multiple** safehouses and **fast-travel** between them when the coast is clear; sieges that probe your weakest wall; residents who defend during a siege; more stations (garden, radio, watch post).
+
+**F. More ways out** — a fourth and fifth route (the river and a boat; the hospital roof), route-specific bosses, and branching objectives so two runs on the same route still differ. A survivors' route: get everyone you rescued out together.
+
+**H. Factions with memory** — marauders who retaliate against your safehouse, a second trader who competes with the Peddler, survivors with their own requests and grudges, reputation that changes prices and who will follow you.
+
+**I. Deeper companions** — orders (hold, guard, scavenge this building), giving them gear, and their own perks as they survive with you.
 
 ## 🧊 Backlog / smaller polish
 - Vehicles (risk/reward: fast + very loud).
 - Save slots and multiple concurrent seeds.
 - Key rebinding; a colour-blind-friendly rarity palette.
 - A proper on-screen tutorial for the first run instead of timed hints.
-- Hand-tuning pass on balance (loot rates, XP curve, hold-out wave sizes) from real play data.
+- Hand-tuning pass on balance (loot rates, XP curve, prices, marauder damage, hold-out wave sizes) from real play data.
 
 ---
 
-_Steering: tell me which Phase 6 letter (or backlog item) to build next, and I'll spec + implement it as the next phase._
+_Steering: tell me which Phase 7 letter (or backlog item) to build next, and I'll spec + implement it as the next phase._
