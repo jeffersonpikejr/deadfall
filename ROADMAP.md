@@ -57,23 +57,37 @@ Ships candidate **D (living town)** and **G (run modifiers & daily seed)**. Ever
 
 ---
 
-## 🔜 Phase 7 — candidate directions (pick one to focus)
+## ✅ Phase 7 — More Ways Out (2026-11-13)
+Ships most of candidate **F (more ways out)** with pieces of **H** and **I**. The new routes are chosen on a third random stream: towns, people and the Peddler are unchanged for every seed, about two seeds in five now roll one of the new routes, and saves written before this phase keep the route they started with.
 
-**E2. Safehouse network** — claim **multiple** safehouses and **fast-travel** between them when the coast is clear; sieges that probe your weakest wall; residents who defend during a siege; more stations (garden, radio, watch post).
+- **The Last Bus** — a school bus parked near the school needs fuel and its keys, and it will not leave empty: at least two survivors must be following you or settled at your safehouse. Sound the horn, hold while everyone boards, drive. The first route built on the people rather than on parts.
+- **The Sweep** — an army column clears the highway at first light on day 4 and every second day after. Scout the pile-up, build a signal pyre from six planks, survive until the window (05:00–10:00), light it and hold until the column reaches you. Miss the window and you wait two more days. The first route built on the clock: three nights, including the first boss.
+- **Marauder raids** — leave the holdout standing and, from day 3, a party comes looking for you in the evening.
+- **Residents defend** — survivors settled at the safehouse fight whatever gets inside, and can be hurt doing it.
+- **The Howler** — from day 3. Everything near it moves a third faster while it stands; killing it staggers the pack.
+- **The Brood Mother** — a second boss that takes turns with the Alpha: slow, births crawlers and spits in threes.
+- **Also** — two origins (Bus Driver, Sentry) unlocked by escaping on the new routes; the hold/siege banner no longer overlaps the clock.
 
-**F. More ways out** — a fourth and fifth route (the river and a boat; the hospital roof), route-specific bosses, and branching objectives so two runs on the same route still differ. A survivors' route: get everyone you rescued out together.
+---
 
-**H. Factions with memory** — marauders who retaliate against your safehouse, a second trader who competes with the Peddler, survivors with their own requests and grudges, reputation that changes prices and who will follow you.
+## 🔜 Phase 8 — candidate directions (pick one to focus)
+
+**E2. Safehouse network** — claim **multiple** safehouses and **fast-travel** between them when the coast is clear; sieges that probe your weakest wall; more stations (garden, radio, watch post).
+
+**H. Factions with memory** — a second trader who competes with the Peddler, survivors with their own requests and grudges, reputation that changes prices and who will follow you; marauders you can pay off instead of fight.
 
 **I. Deeper companions** — orders (hold, guard, scavenge this building), giving them gear, and their own perks as they survive with you.
+
+**J. The river** — docks, a boat route in towns that have a river, and flooding in storms.
+
+**K. First-run tutorial and balance pass** — a guided opening for new players, and tuning from real play data (prices, marauder damage, hold-out waves, XP curve).
 
 ## 🧊 Backlog / smaller polish
 - Vehicles (risk/reward: fast + very loud).
 - Save slots and multiple concurrent seeds.
 - Key rebinding; a colour-blind-friendly rarity palette.
-- A proper on-screen tutorial for the first run instead of timed hints.
-- Hand-tuning pass on balance (loot rates, XP curve, prices, marauder damage, hold-out wave sizes) from real play data.
+- Music: a quiet generative score that tightens when you are hunted.
 
 ---
 
-_Steering: tell me which Phase 7 letter (or backlog item) to build next, and I'll spec + implement it as the next phase._
+_Steering: tell me which Phase 8 letter (or backlog item) to build next, and I'll spec + implement it as the next phase._

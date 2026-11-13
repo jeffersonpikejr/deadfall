@@ -47,6 +47,9 @@
 
   #msgs { position:absolute; top:calc(64px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); width:min(86vw,440px); text-align:center; font-size:12.5px; line-height:1.5; pointer-events:none; }
   #hud.boss #msgs { top:calc(94px + env(safe-area-inset-top)); }
+  #hud.alert #msgs { top:calc(86px + env(safe-area-inset-top)); }
+  #hud.alert #bossBar { top:calc(86px + env(safe-area-inset-top)); }
+  #hud.alert.boss #msgs { top:calc(114px + env(safe-area-inset-top)); }
   .msg { text-shadow:0 1px 2px #000; animation:msgfade 4.5s forwards; }
   @keyframes msgfade { 0%{opacity:0; transform:translateY(-4px);} 8%{opacity:1; transform:translateY(0);} 75%{opacity:1;} 100%{opacity:0;} }
 
@@ -232,7 +235,7 @@
   #hurt { position:fixed; inset:0; pointer-events:none; z-index:4; background:radial-gradient(ellipse at center, transparent 40%, rgba(150,20,15,.55) 100%); opacity:0; transition:opacity .12s; }
   #fever { position:fixed; inset:0; pointer-events:none; z-index:4; background:radial-gradient(ellipse at center, transparent 45%, rgba(70,120,40,.4) 100%); opacity:0; }
   #paused { position:fixed; top:calc(14px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:11; color:#8a8272; letter-spacing:4px; font-size:12px; display:none; }
-  #siegeBanner { position:fixed; top:calc(44px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:8; color:#e85a4a; letter-spacing:4px; font-size:13px; font-weight:bold; text-shadow:0 1px 3px #000; display:none; pointer-events:none; animation:pulse 1s infinite; white-space:nowrap; }
+  #siegeBanner { position:fixed; top:calc(63px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); z-index:8; color:#e85a4a; letter-spacing:4px; font-size:13px; font-weight:bold; text-shadow:0 1px 3px #000; display:none; pointer-events:none; animation:pulse 1s infinite; white-space:nowrap; }
 
   /* ---------- Minimap ---------- */
   #mini { position:fixed; top:calc(10px + env(safe-area-inset-top)); right:calc(10px + env(safe-area-inset-right)); width:96px; height:96px; z-index:7; border:2px solid rgba(200,190,160,.3); background:rgba(6,8,10,.6); pointer-events:auto; image-rendering:pixelated; image-rendering:crisp-edges; box-shadow:0 2px 8px rgba(0,0,0,.5); cursor:pointer; }
@@ -936,6 +939,8 @@ const ORIGINS = {
   survivor:   {n:'The One Who Got Out', ico:'🕯️', d:'You escaped a town like this once. You know how it goes.', kit:['machete','daypack','flash','medkit','water','beans','flare','flare'], perks:{second:1, lucky:1}, skills:{fitness:1}, lock:'Escape Deadfall'},
   dispatcher: {n:'Dispatcher',   ico:'📻', d:'You took the calls that night. You know exactly where people went to ground.', kit:['pistol','ammo','flash','water','bandage'], perks:{leader:1}, skills:{aim:1, firstaid:1}, lock:'Bring 3 survivors home (lifetime)'},
   smuggler:   {n:'Smuggler',     ico:'🧳', d:'You know a man with a van, and he owes you.', kit:['knife','duffel','lockpick','lockpick','water','jerky'], perks:{haggler:1}, skills:{fitness:1}, lock:'Trade 300 credit with the Peddler (lifetime)'},
+  driver:     {n:'Bus Driver',   ico:'🚌', d:'Same route, twenty years. You know every street, and you never left a kid at a stop.', kit:['crowbar','flash','water','water','bandage'], perks:{leader:1, marathon:1}, skills:{fitness:1}, lock:'Escape on the Last Bus'},
+  sentry:     {n:'Sentry',       ico:'🎖️', d:'You stood a post on the line the night it broke. You know when the column runs.', kit:['rifle','rifleammo','flare','flare','mre'], perks:{owl:1}, skills:{aim:2}, lock:'Escape with the Sweep'},
 };
 
 /* ---------- the dead ---------- */
@@ -952,6 +957,8 @@ const ZTYPE = {
   riot:    {hp:[70,90],  spd:[26,38], rad:11, dmg:11, xp:12, day:1, resist:.7, skin:'#59635c'},
   alpha:   {hp:[620,620],spd:[30,34], rad:19, dmg:22, xp:160,day:9, charge:true, boss:true, skin:'#5a3f3a'},
   marauder:{hp:[75,95],  spd:[62,72], rad:10, dmg:10, xp:20, day:99,human:true, skin:'#c9a27c'},
+  howler:  {hp:[50,70],  spd:[24,34], rad:11, dmg:7,  xp:14, day:3, howl:true, skin:'#8d7f9a'},
+  brood:   {hp:[520,520],spd:[18,22], rad:20, dmg:16, xp:160,day:9, boss:true, brood:true, skin:'#6a5a4a'},
 };
 const SHIRTS = ['#4a5a6a','#6a4a4a','#5a5a3a','#3f5548','#6b5b47','#54486a','#7a6a5a','#3d4a5c','#665050','#48605c','#75705a','#4f4f58'];
 // Elite modifiers: roguelike "champions". One per elite, more likely as the days pile up.
@@ -966,12 +973,14 @@ const ELITE = {
 const SURNAMES=['Hale','Okafor','Pruitt','Marsh','Delgado','Whitlock','Nakamura','Brandt','Ferris','Lowell','Voss','Kimball','Reyes','Sato','Mercer','Achterberg'];
 const FIRSTNAMES=['Dale','June','Walt','Ines','Tom','Ruth','Gus','Mara','Eli','Nora','Hank','Vera','Cole','Ada','Roy','Lena'];
 const DAY_TITLES=['THE MORNING AFTER','WHAT THE DARK LEFT','THE QUIET IS WORSE','NO ONE IS COMING','ATTRITION','BORROWED TIME','THE LONG COUNT'];
-const ROUTE_NAME={signal:'The Signal', road:'The Long Road', line:'The Line'};
+const ROUTE_NAME={signal:'The Signal', road:'The Long Road', line:'The Line', bus:'The Last Bus', sweep:'The Sweep'};
 // The note you wake up next to: the hook for this town's way out.
 const START_NOTE={
   signal:`{MOM}'s handwriting, taped to the fridge:\n\n"The phones are dead but the emergency band isn't. A voice keeps repeating — ARMY RELAY STILL LISTENING ON THE DEADFALL TOWER. BROADCAST AND HOLD POSITION.\n\nThe tower's been dark since the grid went. If somebody could get its generator running… I can't. I'm sorry. I'm going to find {KID}."`,
   road:`A page torn from a calendar, left on the counter:\n\n"{MECH}'s tow truck is still up on the lift at the garage. He swore that engine would outlive the town. It needs a battery and gas — and {MECH} never let the keys out of his pocket.\n\nHe went toward the {KEYPLACE} to look for his wife. He didn't come back. If you find him, you'll know him by the coveralls."`,
   line:`Block capitals on the back of an evacuation flyer:\n\n"THE GUARD SEALED THE HIGHWAY. Steel gate, keypad, the works.\n\n{SHERIFF} had the first number. {DOC} had the second. {REV} had the third — 'so no one man opens it in a panic.' All three stayed behind.\n\nIf you are reading this, the gate is still shut."`,
+  bus:`A sheet of lined paper, a child's handwriting corrected in an adult's:\n\n"The school bus is still parked where the driver left it. It only needs gas, and the keys from wherever they keep them.\n\nIt has forty seats. Please don't go without the others. There ARE others — we heard them. Please."`,
+  sweep:`A printed notice, stamped and dated the day it all began:\n\n"NATIONAL GUARD — CORRIDOR SWEEP. An armoured column will clear the highway at FIRST LIGHT ON THE FOURTH DAY, and every second day after.\n\nSurvivors: be at the highway pile-up with a signal fire burning. The column does not enter the town. The column does not wait."`,
 };
 // Lore threads: three pages each, scattered through the right kind of building. Finishing one marks a cache on your map.
 const THREADS = {
@@ -1000,6 +1009,8 @@ const EPILOGUE={
   signal:`The rotors drown out everything — the moaning, the flare's hiss, your own breathing. A gloved hand hauls you over the skid. Below, Deadfall shrinks to a grid of dark streets, then a smudge, then nothing. Nobody on board asks what you did to stay alive. They already know.`,
   road:`The engine catches, coughs, and holds. You put your foot down and the truck shoulders through the wrecks on the highway like they were paper. In the mirror the town gets small. You watch it until the road bends, and then you stop watching.`,
   line:`The gate grinds open one steel tooth at a time. Beyond the line the highway is empty and straight, and somewhere at the end of it there are people who are only people. You walk. You do not run. You have done enough running.`,
+  bus:`The bus shoulders through the last of them and the town falls away behind the rear window. Nobody talks for a long time. Then somebody in the back starts to laugh, or cry — it is hard to tell which — and you find you cannot stop either. Forty seats. You filled what you could.`,
+  sweep:`The lead vehicle does not even stop rolling. A hatch bangs open, a hand reaches down, and then there is steel under your boots and diesel in your lungs and the highway unspooling behind you. Three nights. You count them again to be sure. Three nights, and you were still there in the morning.`,
 };
 const EPITAPH={
   'a zombie':['They found you the way they find everyone. You made them work for it.','In the end it was hands. It is always hands.'],
@@ -1010,6 +1021,7 @@ const EPITAPH={
   'the fire':['You lit it to keep them away. It did not know the difference.'],
   'the gas':['You held your breath for as long as anyone can.'],
   'the Alpha':['It had been hunting you since the first night. It was patient.'],
+  'the Brood Mother':['She was never alone. Neither, at the end, were you.'],
   'a marauder':['The dead were never the only thing to be afraid of.','They wanted what you were carrying. Now they have it.'],
   'an explosion':['Loud, bright, and brief. There are worse ways in Deadfall.'],
 };
@@ -1825,6 +1837,7 @@ function rollZombieKind(atNight,district){
   if(district==='downtown' && curRng()<.06) return 'riot';
   const w=[['walker',60],['crawler',9],['runner',7+Math.min(d,6)*2],['brute',4+Math.min(d,6)]];
   if(d>=2) w.push(['screamer',5],['spitter',4+Math.min(d,5)],['bloater',3+Math.min(d,5)*.6]);
+  if(d>=3) w.push(['howler',3]);
   return wpick(w);
 }
 function makeZombie(px,py,forceKind,noElite){
@@ -2720,9 +2733,11 @@ function killZombie(z,o){
   zombieDrop(z,S);
   if(S.boss){
     boss=null; SFX.roar(); shake=Math.max(shake,12);
-    msg('The Alpha goes down. The town is quieter for it.','#e6c86e'); chron('Brought down the Alpha.'); showCard('THE ALPHA IS DEAD','something in the dark has stopped looking for you');
+    const bn=z.kind==='brood'?'Brood Mother':'Alpha';
+    msg(`The ${bn} goes down. The town is quieter for it.`,'#e6c86e'); chron(`Brought down the ${bn}.`); showCard(`THE ${bn.toUpperCase()} IS DEAD`,'something in the dark has stopped looking for you');
     run.alpha++; metaFlag('alpha');
   } else if(z.elite){ run.elites++; }
+  if(S.howl) howlerDied(z);
   if(z.story) storyZombieKilled(z);
 }
 function zombieDrop(z,S){
@@ -2784,7 +2799,7 @@ function zombieHitsPlayer(z){
     else wearArmor(loc,1);
   }
   const boss=(ZTYPE[z.kind]||{}).boss;
-  if(!hurtPlayer(dmg,boss?'the Alpha':'a zombie',z.x,z.y)) return;
+  if(!hurtPlayer(dmg,boss?(z.kind==='brood'?'the Brood Mother':'the Alpha'):'a zombie',z.x,z.y)) return;
   if(state!=='play') return;
   // heavy impacts can fracture a leg
   if((z.kind==='brute'||boss) && !P.fracture && Math.random()<.15){ P.fracture=1; msg('💥 Something gives with a crack. You are limping.','#e77'); }
@@ -2908,6 +2923,7 @@ function updateZombies(dt){
     const dP2=dist2(z.x,z.y,P.x,P.y);
     if(z.flash>0) z.flash-=dt;
     if(z.trapCd>0) z.trapCd-=dt;
+    if(z.hasteT>0) z.hasteT-=dt;
     // wounds keep working
     if(z.bleedT>0){ z.bleedT-=dt; z.hp-=z.bleed*dt; }
     if(z.burn>0){ z.burn-=dt; z.hp-=8*dt; if(Math.random()<dt*9) particles.push({x:z.x+R(-6,6),y:z.y+R(-6,6),vx:R(-10,10),vy:-R(20,45),t:.5,l:.5,c:'#ff9a2a',s:2}); }
@@ -3014,7 +3030,9 @@ function updateZombies(dt){
       z.chargeT-=dt;
       if(z.chargeT<=0 && z.state==='chase' && z.sees && dcur>70 && dcur<250){ z.chargeT=R(5,8); z.chgW=S.boss?.6:.75; }
     }
-    if(S.boss){   // the Alpha rallies whatever is near it
+    if(S.brood) broodAI(z,dt,dcur,near);
+    if(S.howl) howlAI(z,dt,near);
+    if(S.boss){   // a boss rallies whatever is near it
       z.roarT=(z.roarT||6)-dt;
       if(z.roarT<=0 && z.state==='chase'){ z.roarT=R(11,15); emitNoise(z.x,z.y,34); if(near){ SFX.roar(); ripple(z.x,z.y); shake=Math.max(shake,4); }
         for(const o of zombies) if(o!==z && dist2(o.x,o.y,z.x,z.y)<(12*TS)*(12*TS)){ o.state='chase'; o.seenT=0; o.track=Math.max(o.track,10); } }
@@ -3026,7 +3044,7 @@ function updateZombies(dt){
       if(hunting && !(dcur<TS*2.3 && z.sees)){ const j=flowStep(z); if(j>=0){ gx=((j%MW)+.5)*TS; gy=(((j/MW)|0)+.5)*TS; } }
       let dx=gx-z.x, dy=gy-z.y, m=Math.hypot(dx,dy);
       if(m>4){
-        let sp=(z.state==='chase'? z.spd*1.35 : z.spd*.6) * z.lungeV;
+        let sp=(z.state==='chase'? z.spd*1.35 : z.spd*.6) * z.lungeV * (z.hasteT>0?1.3:1);
         if(S.spit && z.sees && dcur<140){ dx=z.x-P.x; dy=z.y-P.y; m=Math.hypot(dx,dy)||1; sp*=.8; }   // keep its distance
         vx=dx/m*sp; vy=dy/m*sp;
         z.face+=clamp(angN(Math.atan2(dy,dx)-z.face),-7*dt,7*dt);
@@ -3218,7 +3236,7 @@ function updateSpawns(dt){
   // ---- escalation events ----
   if(power && day>=3 && h>=21){ power=false; msg('The streetlights stutter and die. The grid is gone for good.','#c96'); chron('The power failed.'); }
   if(day>=2 && dropDay<day && h>=10 && h<16){ dropDay=day; if(Math.random()<.75) spawnAirdrop(); }
-  if((mod('hunted') || (day>=3 && (day-3)%2===0)) && alphaDay<day && h>=22 && !boss && !(story&&story.hold)){ alphaDay=day; spawnAlpha(); }
+  if((mod('hunted') || (day>=3 && (day-3)%2===0)) && alphaDay<day && h>=22 && !boss && !(story&&story.hold)){ alphaDay=day; spawnBoss(); }
   if(day>=2 && heliDay<day && h>=14 && h<18 && !heli){
     heliDay=day;
     if(Math.random()<.4){   // a flyover: it is not here for you, but everything follows the sound
@@ -3393,6 +3411,8 @@ const UNLOCK_TEST={
   survivor:  ()=>(META.wins||0)>=1,
   dispatcher:()=>((META.life&&META.life.saved)||0)>=3,
   smuggler:  ()=>((META.life&&META.life.traded)||0)>=300,
+  driver:    ()=>!!(META.flags&&META.flags.win_bus),
+  sentry:    ()=>!!(META.flags&&META.flags.win_sweep),
 };
 function originUnlocked(id){ return !ORIGINS[id].lock || !!META.unlocks[id]; }
 function checkUnlocks(){   // returns the origins that just opened up
@@ -3468,7 +3488,7 @@ function die(cause){
 function winRun(){
   if(state!=='play') return;
   state='won';
-  chron('Got out of Deadfall.');
+  chron('Got out of Deadfall.'); metaFlag('win_'+story.route);
   clearSave(); ambSet(0,0); SFX.win();
   const r=endRun(true,'');
   $('winEpi').textContent=EPILOGUE[story.route]+(savedCount()?' And this time, you are not the only one who made it.':'');
@@ -3483,14 +3503,14 @@ function winRun(){
 }
 
 /* ================= STORY =================
-   Each seed rolls one of three ways out of town, then hides what that route needs across the
+   Each seed rolls a way out of town (five in all; two are added in MORE WAYS OUT), then hides what it needs across the
    landmarks: reach the hub, fetch the parts, come back, start it, hold out, leave. Lore threads
    are scattered alongside; finishing one opens a hidden cache. */
-const HUB={signal:'tower', road:'garage', line:'checkpoint'};
-const HUB_NAME={signal:'the radio tower', road:'the garage', line:'the army checkpoint'};
-const ROUTE_KEYS={signal:['fuel','fuse'], road:['fuel','battery','keys'], line:['code1','code2','code3']};
-const KEY_NAME={fuel:'Fuel can', fuse:'Relay fuse', battery:'Car battery', keys:'Truck keys', code1:'Gate code, 1st digit', code2:'Gate code, 2nd digit', code3:'Gate code, 3rd digit'};
-const KEY_ICO={fuel:'⛽', fuse:'🔌', battery:'🔋', keys:'🔑', code1:'🔢', code2:'🔢', code3:'🔢'};
+const HUB={signal:'tower', road:'garage', line:'checkpoint', bus:'bus', sweep:'wreck'};
+const HUB_NAME={signal:'the radio tower', road:'the garage', line:'the army checkpoint', bus:'the school bus', sweep:'the highway pile-up'};
+const ROUTE_KEYS={signal:['fuel','fuse'], road:['fuel','battery','keys'], line:['code1','code2','code3'], bus:['fuel','buskeys'], sweep:['pyre']};
+const KEY_NAME={fuel:'Fuel can', fuse:'Relay fuse', battery:'Car battery', keys:'Truck keys', code1:'Gate code, 1st digit', code2:'Gate code, 2nd digit', code3:'Gate code, 3rd digit', buskeys:'Bus keys', pyre:'Signal pyre'};
+const KEY_ICO={fuel:'⛽', fuse:'🔌', battery:'🔋', keys:'🔑', code1:'🔢', code2:'🔢', code3:'🔢', buskeys:'🔑', pyre:'🔥'};
 
 function contsIn(B,pred){   // container tiles inside a building
   const out=[];
@@ -3620,16 +3640,25 @@ function objective(){   // what the HUD, the journal and the map should point at
   if(s===2){
     const parts=[], marks=[];
     for(const k of ROUTE_KEYS[r]){ const got=st.have[k], ka=st.keyAt[k]; parts.push((got?'✓ ':'○ ')+KEY_NAME[k]+((got||!ka)?'':' — '+ka.where)); if(!got&&ka) marks.push({x:ka.x,y:ka.y}); }
-    return {t:{signal:'Power the relay.',road:'Get the truck running.',line:'Find the gate code.'}[r], s:parts.join('\n'), marks};
+    if(r==='bus'){
+      const need=busNeed(), rdy=readyToLeave(), ok=rdy>=need;
+      parts.push(need ? (ok?'✓ ':'○ ')+`People to take with you — ${Math.min(rdy,need)}/${need}`+(ok?'':' · bring survivors along, or settle them at your safehouse') : '✓ There is no one left alive to take');
+      if(!ok) for(const n of npcs) if(n.state==='wait'&&n.poi.found) marks.push({x:n.poi.x,y:n.poi.y});
+    } else if(r==='sweep' && !st.have.pyre) parts.push(`You are carrying ${countItem('planks')} planks.`);
+    return {t:{signal:'Power the relay.',road:'Get the truck running.',line:'Find the gate code.',bus:'Fuel, keys — and passengers.',sweep:'Build a signal pyre the column cannot miss.'}[r], s:parts.join('\n'), marks};
   }
-  if(s===3) return {t:{signal:'Start the generator at the tower.',road:'Fit the parts and start the truck.',line:'Enter the code at the gate.'}[r], s:'It will be loud. Be ready.', marks:at(HUB[r])};
-  if(s===4) return {t:{signal:'Hold the tower while the signal goes out.',road:'Hold the yard while the engine warms.',line:'Hold the gate while it opens.'}[r], s:'', marks:at(HUB[r])};
+  if(s===3 && r==='sweep'){
+    const open=sweepWindow();
+    return {t:open?'LIGHT THE PYRE. The column is on the highway.':`Light the pyre at first light on Day ${nextSweepDay()}.`, s:open?'They will not stop twice.':'The column passes between 05:00 and 10:00. Stay alive until then — rest if you can.', marks:at(HUB[r])};
+  }
+  if(s===3) return {t:{signal:'Start the generator at the tower.',road:'Fit the parts and start the truck.',line:'Enter the code at the gate.',bus:'Start the bus and sound the horn.'}[r], s:'It will be loud. Be ready.', marks:at(HUB[r])};
+  if(s===4) return {t:{signal:'Hold the tower while the signal goes out.',road:'Hold the yard while the engine warms.',line:'Hold the gate while it opens.',bus:'Hold the bus while everyone gets aboard.',sweep:'Hold the highway until the column reaches you.'}[r], s:'', marks:at(HUB[r])};
   if(r==='signal'){
     if(s===5) return {t:'Get to the school field. Light the beacon.', s:'"Extraction at the field. Pop smoke and hold."', marks:at('lz')};
     if(s===6) return {t:'Hold the landing zone.', s:'', marks:at('lz')};
     return {t:'GET TO THE HELICOPTER.', s:'', marks:at('lz')};
   }
-  return {t:r==='road'?'Get in. Drive.':'Walk through the gate.', s:'', marks:at(HUB[r])};
+  return {t:{road:'Get in. Drive.',line:'Walk through the gate.',bus:'Everyone is aboard. Drive.',sweep:'Climb aboard.'}[r], s:'', marks:at(HUB[r])};
 }
 function startHold(t,x,y,label){
   story.hold={t,x,y,r:10*TS,label,waveT:3,warn:0};
@@ -3646,6 +3675,15 @@ function holdDone(){
     } else if(r==='road'){
       msg('The engine settles into a steady idle. It will run.','#e6c86e');
       setStep(5,'Got the tow truck running.');
+    } else if(r==='bus'){
+      const n=readyToLeave();
+      msg(n?`Doors shut. ${n} ${n>1?'people':'person'} aboard, counted twice. The engine is warm.`:'Doors shut. The engine is warm. The seats are empty, and there is no one left to wait for.','#e6c86e');
+      setStep(5,'Got the school bus loaded and running.');
+    } else if(r==='sweep'){
+      convoy={x:st.hold?st.hold.x:P.x,y:st.hold?st.hold.y:P.y,t:0}; if(st.pyre!=null) convoy={x:((st.pyre%MW)+.5)*TS+46,y:(((st.pyre/MW)|0)+.5)*TS,t:0};
+      SFX.engine();
+      msg('Steel and diesel. The lead vehicle slows at the pile-up without stopping — a hatch is open. GO.','#e6c86e');
+      setStep(5,'The army column reached the pile-up.');
     } else {
       for(const i of st.gate){ fixtures.delete(i); setTile(i,RD); burst(((i%MW)+.5)*TS,(((i/MW)|0)+.5)*TS,6,'#8a826e',80,.6); }
       SFX.smash();
@@ -3665,11 +3703,18 @@ function storyTick(dt){
   if(st.step===1 && hub && dist2(ptx,pty,hub.x,hub.y)<5.5*5.5){
     const line={signal:'Reached the radio tower. The relay is dead — no fuel, and a blown fuse.',
                 road:`Reached the garage. The truck is whole, but it has no battery, no gas, and ${st.names.MECH} has the keys.`,
-                line:'Reached the checkpoint. The gate needs a three-digit code.'}[st.route];
+                line:'Reached the checkpoint. The gate needs a three-digit code.',
+                bus:'Reached the school bus. The tank is dry and the keys are gone — but it has forty seats, and you are not the only one left in Deadfall.',
+                sweep:'Reached the pile-up. This is where the column will pass, and it will take a fire they cannot miss: six planks, stacked here.'}[st.route];
     msg(line.slice(line.indexOf('.')+2),'#cb9');
     setStep(2,line);
   }
-  if(st.step===2 && ROUTE_KEYS[st.route].every(k=>st.have[k])) setStep(3,'Had everything the way out needed.');
+  if(st.step===2 && ROUTE_KEYS[st.route].every(k=>st.have[k]) && routeExtraOk()) setStep(3,'Had everything the way out needed.');
+  if(st.route==='sweep' && st.step<=3 && !st.hold && day>=SWEEP_DAY && (day-SWEEP_DAY)%2===0){   // the column keeps its own clock
+    const h=(gameMin/60)%24;
+    if(h>=5 && h<10 && st.openDay!==day){ st.openDay=day; SFX.objective(); msg('Engines on the highway. The column is passing the pile-up — this is the window.','#e6c86e'); hudDirty=true; }
+    if(h>=10 && st.missDay!==day){ st.missDay=day; msg('The engines fade. The column has passed without you. They sweep again at first light in two days.','#c96'); chron('Missed the army column.'); hudDirty=true; }
+  }
   if(st.hold){
     const h=st.hold;
     if(dist2(P.x,P.y,h.x,h.y)<h.r*h.r){ h.t-=dt; h.warn=0; }
@@ -3693,6 +3738,8 @@ function fxLabel(i,f){
   switch(f.kind){
     case 'bench': return 'WORKBENCH';
     case 'trader': return 'TRADE';
+    case 'bus': return s===3?'START THE BUS' : s===5?'DRIVE' : s===4?null : 'SCHOOL BUS';
+    case 'pyre': return (s<=2&&!st.have.pyre)?'BUILD PYRE' : s===3?'LIGHT PYRE' : s===5?'CLIMB ABOARD' : s===4?null : 'SIGNAL PYRE';
     case 'generator': return (r==='signal'&&s===3)?'START GENERATOR' : (r==='signal'&&s>3)?null : 'GENERATOR';
     case 'radio': return 'RADIO';
     case 'truck': return (r==='road'&&s===3)?'START TRUCK' : (r==='road'&&s===5)?'DRIVE' : (r==='road'&&s===4)?null : 'TOW TRUCK';
@@ -3705,6 +3752,8 @@ function fxInteract(i,f){
   const st=story, s=st.step, r=st.route, fx=((i%MW)+.5)*TS, fy=(((i/MW)|0)+.5)*TS;
   if(f.kind==='bench'){ openBag('craft'); return; }
   if(f.kind==='trader'){ openTrade(); return; }
+  if(f.kind==='bus'){ busInteract(fx,fy); return; }
+  if(f.kind==='pyre'){ pyreInteract(i,fx,fy); return; }
   if(f.kind==='generator'){
     if(r==='signal'&&s===3){
       SFX.engine(); msg('The generator coughs, catches, and ROARS. The relay lights up. Everything in town heard it.','#e55');
@@ -3929,7 +3978,7 @@ function updateNpcs(dt){
   for(const n of npcs){
     if(n.state==='dead') continue;
     if(n.swingT>0) n.swingT-=dt;
-    if(n.state!=='follow'){
+    if(n.state==='wait'){   // still in hiding: the dead pass them by
       if(n.hp<n.maxhp) n.hp=Math.min(n.maxhp,n.hp+2*dt);
       if(!n.met && !n.called && dist2(n.x,n.y,P.x,P.y)<(5.5*TS)*(5.5*TS)){
         n.called=true; SFX.click(); ripple(n.x,n.y,'rgba(140,200,230,');
@@ -3937,6 +3986,7 @@ function updateNpcs(dt){
       }
       continue;
     }
+    const atHome=n.state==='home';   // settled people hold their ground and fight for the place
     n.atkCd-=dt;
     const hunter=n.role==='hunter', reach=hunter?250:46;
     let tz=null, bd=reach*reach;
@@ -3958,6 +4008,7 @@ function updateNpcs(dt){
       }
     } else if(n.hp<n.maxhp) n.hp=Math.min(n.maxhp,n.hp+3*dt);
     // keep up: follow the same path field the dead use, open doors, and never get lost behind a window
+    if(atHome){ n.moving=false; continue; }
     const d=Math.hypot(P.x-n.x,P.y-n.y), engaged=tz&&!hunter;
     if(d>TS*2.1 && !engaged){
       let gx=P.x, gy=P.y;
@@ -4179,6 +4230,7 @@ function updateTownEvents(dt,h){
   }
   if(flareDay<day && h>=evtHours.flare && h<20){ flareDay=day; distressFlare(); }
   if(day>=2 && herdDay<day && h>=evtHours.herd && h<21){ herdDay=day; if(Math.random()<.8) startHerd(); }
+  if(day>=3 && raidDay<day && h>=17.5 && h<22 && story.holdout>=0 && !story.cleared && !story.hold){ raidDay=day; if(Math.random()<.6) marauderRaid(); }
   if(day>=2 && fireDay<day && h>=evtHours.fire){ fireDay=day; if(Math.random()<.45) startBlaze(); }
   if(herd){
     herd.t-=dt; herd.ct-=dt;
@@ -4189,6 +4241,156 @@ function updateTownEvents(dt,h){
     }
   }
   if(blaze){ blaze.t-=dt; if(blaze.t<=0){ const k=pois.indexOf(blaze.p); if(k>=0) pois.splice(k,1); blaze=null; miniDirty=true; } }
+}
+
+/* ================= MORE WAYS OUT =================
+   Two further escape routes, chosen on a third random stream so the town and its people stay put:
+   THE LAST BUS (fuel, keys — and passengers: the survivors you have rescued), and
+   THE SWEEP (build a pyre on the highway and be there, alive, when the army column passes at dawn).
+   Also here: marauder raids, the Howler, and the Brood Mother. */
+let raidDay=0, convoy=null;
+const SWEEP_DAY=4;
+function sweepWindow(){ const h=(gameMin/60)%24; return day>=SWEEP_DAY && (day-SWEEP_DAY)%2===0 && h>=5 && h<10; }
+function nextSweepDay(){ if(day<SWEEP_DAY) return SWEEP_DAY; const h=(gameMin/60)%24; if((day-SWEEP_DAY)%2!==0) return day+1; return h>=10?day+2:day; }
+function readyToLeave(){ return npcs.filter(n=>n.state==='follow'||n.state==='home').length; }
+function busNeed(){ return Math.min(2,npcs.filter(n=>n.state!=='dead').length); }
+function routeExtraOk(){ return story.route!=='bus' || readyToLeave()>=busNeed(); }
+
+function genRoutes(allow){   // allow=false for saves written before these routes existed: they keep the route they started with
+  convoy=null;
+  if(!allow) return;
+  const main=curRng; curRng=mulberry32((SEED^0x0B5E55ED)>>>0);
+  const roll=curRng(), sb=buildings[startHouseIdx], sx=sb.x+sb.w/2, sy=sb.y+sb.h/2;
+  let want = (roll<.2 && npcs.length>=3) ? 'bus' : (roll>=.2 && roll<.4 && findPoi('wreck')) ? 'sweep' : null, spot=null;
+  if(want==='bus'){   // a school bus parked by a kerb, preferably near the school
+    const sc=findPoi('school');
+    for(let k=0;k<8000&&!spot;k++){
+      const tx=RI(RING0+4,RING1-8), ty=RI(RING0+4,RING1-7);
+      if(sc && k<4000 && dist2(tx,ty,sc.x,sc.y)>26*26) continue;
+      if(dist2(tx,ty,sx,sy)<14*14) continue;
+      let ok=true, street=false;
+      for(let y=ty-1;y<=ty+2&&ok;y++) for(let x=tx-1;x<=tx+3;x++){
+        const i=idx(x,y), t=tiles[i], inner=x>=tx&&x<tx+3&&y>=ty&&y<ty+2;
+        if(inner){ if(!(t===G||t===PK)||keep[i]||tvar[i]||conts.has(i)){ ok=false; break; } }
+        else { if(TSOL[t]){ ok=false; break; } if(t===SW||t===RD) street=true; }
+      }
+      if(ok&&street) spot=[tx,ty];
+    }
+    if(spot){
+      for(let k=0;k<6;k++){ const i=idx(spot[0]+(k%3),spot[1]+((k/3)|0)); tiles[i]=FX; tvar[i]=0; keep[i]=2; fixtures.set(i,{kind:'bus',part:k}); refreshBlk(i); }
+      const p={t:'bus',n:'School Bus',x:spot[0]+1.5,y:spot[1]+1,bi:-1,found:false}; p.fx=idx(spot[0]+1,spot[1]); pois.push(p);
+    } else want=null;
+  } else if(want==='sweep'){   // a place to build a fire where the column will see it
+    const w=findPoi('wreck'), wx=Math.floor(w.x), wy=Math.floor(w.y);
+    for(const pass of [SW,RD]){ for(let dy=-3;dy<=3&&!spot;dy++) for(let dx=-3;dx<=3&&!spot;dx++){
+      const x=wx+dx, y=wy+dy; if(!inb(x,y)) continue; const i=idx(x,y);
+      if(tiles[i]!==pass||conts.has(i)) continue;
+      let free=0; for(const o of NB4) if(!TSOL[tiles[i+o]]) free++;
+      if(free>=3) spot=[x,y];
+    } if(spot) break; }
+    if(spot){ const i=idx(spot[0],spot[1]); tiles[i]=FX; tvar[i]=0; keep[i]=2; fixtures.set(i,{kind:'pyre'}); refreshBlk(i); story.pyre=i; }
+    else want=null;
+  }
+  if(want){   // re-plan the story for the new route: clear the old key items, hide the new ones
+    for(const c of conts.values()) c.key=null;
+    story.route=want; story.keyAt={}; story.keyPoi=null; story.keyPlace='';
+    if(want==='bus'){ story.keyAt.fuel=placeKey('fuel',['gas','garage','warehouse']); story.keyAt.buskeys=placeKey('buskeys',['school','firestation','police']); }
+    else story.keyAt.pyre={x:spot[0]+.5,y:spot[1]+.5,where:'six planks, stacked at the pile-up'};
+  }
+  curRng=main;
+}
+function busInteract(fx,fy){
+  const st=story, s=st.step;
+  if(s===3){
+    SFX.engine(); SFX.alarm();
+    msg('The engine catches. You lean on the horn — three long blasts, the signal you agreed on. Everyone who is coming heard it. So did everything else.','#e55');
+    startHold(70,fx,fy,'BOARDING'); setStep(4,'Started the school bus and sounded the horn.');
+  } else if(s===5){ st.done=true; winRun(); }
+  else {
+    const miss=ROUTE_KEYS.bus.filter(k=>!st.have[k]).map(k=>KEY_NAME[k].toLowerCase()), need=busNeed(), rdy=readyToLeave();
+    if(rdy<need) miss.push((need-rdy)+' more '+(need-rdy>1?'people':'person')+' to take with you');
+    msg(miss.length?'Not yet. It still needs: '+miss.join(', ')+'.':'Forty seats. A full tank would do it.','#998');
+  }
+}
+function pyreInteract(i,fx,fy){
+  const st=story, s=st.step;
+  if(s<=2 && !st.have.pyre){
+    const n=countItem('planks');
+    if(n<6){ msg(`A fire the column cannot miss will take six planks. You have ${n}. Break down furniture.`,'#998'); return; }
+    takeItem('planks',6); SFX.door(); addSkill('carpentry',4); chunkDirtyAt(i); syncBag();
+    if(s<2) st.step=2;
+    storyKey('pyre');
+  } else if(s===3){
+    if(!sweepWindow()){ msg(`Not yet. Light it now and you burn your only signal for nothing. They pass at first light on Day ${nextSweepDay()}.`,'#998'); return; }
+    flares.push({x:fx,y:fy-10,t:200,pt:0,smoke:true}); fires.push({x:fx,y:fy,r:.6*TS,t:200}); SFX.smash();
+    msg('The pyre goes up in a column of black smoke. Somewhere up the highway an engine changes note. They have seen you. So has the town.','#e55');
+    startHold(80,fx,fy,'COLUMN INBOUND'); setStep(4,'Lit the signal pyre at first light.');
+  } else if(s===5){ st.done=true; winRun(); }
+  else msg('Six planks, stacked and waiting for a match.','#998');
+}
+
+/* ---------- marauders with a memory ---------- */
+function marauderRaid(){   // leave the holdout standing and, sooner or later, they come looking for you
+  let made=0;
+  for(let k=0;k<2;k++){
+    const p=ringSpawnPoint(P.x,P.y,16,22); if(!p) continue;
+    const z=makeZombie(p.x,p.y,'marauder',true);
+    z.story='raid'; z.name='MARAUDER'; z.shirt=pick(['#4a2a2a','#2e2e34','#3a3524']); z.state='chase'; z.seenT=0; z.track=140; z.shootCd=R(1,2); z.aimT=0; z.aimA=0;
+    zombies.push(z); made++;
+  }
+  if(!made) return false;
+  msg('Boots on the road, and voices that are not afraid of the dark. The marauders have come looking for whoever is picking this town clean.','#e88');
+  chron('The marauders came looking for you.');
+  return true;
+}
+
+/* ---------- new threats ---------- */
+function spawnBoss(){   // the Alpha first; after that they take turns
+  const n=run.bossN||0, ok=(n%2===1)?spawnBrood():spawnAlpha();
+  if(ok) run.bossN=n+1;
+  return ok;
+}
+function spawnBrood(){
+  const p=ringSpawnPoint(P.x,P.y,20,28); if(!p) return false;
+  const z=makeZombie(p.x,p.y,'brood',true);
+  z.state='chase'; z.seenT=0; z.track=99999; z.name='THE BROOD MOTHER'; z.broodT=4; z.volT=3;
+  zombies.push(z); boss=z;
+  SFX.roar(); shake=Math.max(shake,6);
+  msg('Something is dragging itself through the streets, and the street is crawling with what follows it.','#e55');
+  showCard('THE BROOD MOTHER','she does not come alone'); chron('The Brood Mother came.');
+  return true;
+}
+function broodAI(z,dt,dcur,near){   // births crawlers, and spits in threes
+  z.broodT-=dt; z.volT-=dt;
+  if(z.broodT<=0 && z.state==='chase'){
+    z.broodT=7;
+    let kids=0; for(const o of zombies) if(o.mother===z) kids++;
+    for(let k=0;k<2&&kids<8;k++,kids++){
+      const a=R(0,6.283), x=z.x+Math.cos(a)*26, y=z.y+Math.sin(a)*26;
+      if(blk[tileIdxAt(x,y)]&1) continue;
+      const c=makeZombie(x,y,'crawler',true); c.state='chase'; c.seenT=0; c.track=30; c.mother=z; zombies.push(c);
+      burst(x,y,6,'#7a8a4a',70,.4);
+    }
+    if(near) SFX.hiss();
+  }
+  if(z.volT<=0 && z.sees && dcur>70 && dcur<340){
+    z.volT=4.2;
+    const a0=Math.atan2(P.y-z.y,P.x-z.x);
+    for(const da of [-.22,0,.22]){ const a=a0+da; shots.push({x:z.x+Math.cos(a)*18,y:z.y+Math.sin(a)*18,vx:Math.cos(a)*215,vy:Math.sin(a)*215,t:1.7}); }
+    if(near) SFX.spit();
+  }
+}
+function howlAI(z,dt,near){   // while it stands, everything near it moves faster: kill it first
+  z.howlT=(z.howlT||0)-dt;
+  if(z.howlT>0||z.state!=='chase') return;
+  z.howlT=.6;
+  for(const o of zombies){ if(o===z||(ZTYPE[o.kind]||{}).human) continue; if(dist2(o.x,o.y,z.x,z.y)<(6*TS)*(6*TS)) o.hasteT=1; }
+  if(near && !run.howlSeen && z.vis>.5){ run.howlSeen=1; SFX.scream(); msg('A HOWLER. The pack runs faster while it stands — put it down first.','#c58ad8'); }
+}
+function howlerDied(z){
+  let n=0;
+  for(const o of zombies) if(o.hasteT>0 && dist2(o.x,o.y,z.x,z.y)<(7*TS)*(7*TS)){ o.hasteT=0; o.stun=Math.max(o.stun,.8); n++; }
+  if(n && dist2(z.x,z.y,P.x,P.y)<(20*TS)*(20*TS)) msg('The howl cuts off. The pack falters.','#bd9');
 }
 
 /* ================= RENDERING =================
@@ -4511,6 +4713,29 @@ function paintFx(c,f,px,py,i){
     case 'gate': rect('#17181a',0,10,32,12); rect('#4a525a',0,11,32,10); c.fillStyle='#d8b84a'; for(let j=0;j<4;j++){ c.beginPath(); c.moveTo(px+j*8,py+21); c.lineTo(px+j*8+4,py+11); c.lineTo(px+j*8+8,py+11); c.lineTo(px+j*8+4,py+21); c.closePath(); c.fill(); } rect('#17181a',0,10,32,1); rect('#17181a',0,21,32,1); break;
     case 'keypad': rect('#17181a',11,5,10,22); rect('#59616a',12,6,8,20); rect('#1c2a22',13,8,6,5); for(let j=0;j<6;j++) rect('#c9c4b4',13+(j%2)*4,15+((j/2)|0)*3,2,2); circ('#e85a4a',16,10,1.5); break;
     case 'beacon': circ('#17181a',16,16,12); circ('#a8342a',16,16,10.5); c.strokeStyle='rgba(0,0,0,.3)'; c.lineWidth=1; c.beginPath(); c.arc(px+16,py+16,7,0,6.2832); c.stroke(); rect('#e6e2d6',11,14,10,4); rect('#d8b84a',14,9,4,14); break;
+    case 'bus': { const k=f.part||0, ox=-(k%3)*32, oy=-((k/3)|0)*32;   // one 96x64 school bus across six tiles
+      c.save(); c.beginPath(); c.rect(px,py,TS,TS); c.clip(); c.translate(px+ox,py+oy);
+      c.fillStyle='#17181a'; c.fillRect(12,6,14,6); c.fillRect(12,52,14,6); c.fillRect(66,6,14,6); c.fillRect(66,52,14,6);
+      c.fillStyle='#b8862a'; c.fillRect(3,10,90,44);
+      c.fillStyle='#e0b040'; c.fillRect(5,12,86,40);
+      c.fillStyle='rgba(0,0,0,.2)'; c.fillRect(5,12,86,3); c.fillRect(5,49,86,3);
+      c.fillStyle='#1a1a1c'; c.fillRect(5,31,76,2.5);
+      c.fillStyle='#1c2730'; for(let j=0;j<6;j++){ c.fillRect(9+j*12,17,9,5); c.fillRect(9+j*12,42,9,5); }
+      c.fillRect(83,17,7,30); c.fillStyle='rgba(160,200,220,.22)'; c.fillRect(85,18,2,28);
+      c.fillStyle='#c9952e'; c.fillRect(30,25,28,14);
+      c.fillStyle='#d8d2a0'; c.fillRect(90,14,3,6); c.fillRect(90,44,3,6);
+      c.fillStyle='#c0392b'; c.fillRect(58,5,6,6);
+      c.restore(); break; }
+    case 'pyre':
+      if(story&&story.have&&story.have.pyre){   // stacked and waiting for a match
+        circ('rgba(0,0,0,.3)',16,17,13);
+        for(let j=0;j<6;j++){ c.save(); c.translate(px+16,py+16); c.rotate(j*1.047+.3); c.fillStyle=j%2?'#6b4f2e':'#7a5a33'; c.fillRect(-13,-2.5,26,5); c.strokeStyle='#3a2a16'; c.lineWidth=1; c.strokeRect(-13,-2.5,26,5); c.restore(); }
+        circ('#3a2a16',16,16,3);
+      } else {                                  // a scorched ring where a fire should be
+        circ('rgba(20,18,16,.55)',16,16,12); c.strokeStyle='rgba(230,220,190,.5)'; c.lineWidth=1.5; c.setLineDash([4,3]); c.beginPath(); c.arc(px+16,py+16,10,0,6.2832); c.stroke(); c.setLineDash([]);
+        for(let j=0;j<6;j++) circ('#6a6a66',16+Math.cos(j*1.047)*12,16+Math.sin(j*1.047)*12,2.2);
+      }
+      break;
     case 'trader':   // the Peddler's armoured van, hatch open
       rect('#17181a',2,3,28,5); rect('#17181a',2,24,28,5);
       rect('#1e2420',1,6,30,20); rect('#4a5a44',2,7,28,18); rect('rgba(0,0,0,.2)',2,7,28,3); rect('rgba(0,0,0,.2)',2,22,28,3);
@@ -4714,6 +4939,8 @@ function drawZombie(z,px,py,now){
     c.strokeStyle=S.boss?'rgba(232,90,74,.8)':ELITE[z.elite].c; c.lineWidth=2; c.globalAlpha=z.vis*(.5+.3*Math.sin(now/200+z.ph));
     c.beginPath(); c.arc(0,0,z.rad+5,0,6.2832); c.stroke(); c.globalAlpha=z.vis;
   }
+  if(z.hasteT>0 && !S.howl){ c.strokeStyle='rgba(197,138,216,.5)'; c.lineWidth=1.5; c.beginPath(); c.arc(0,0,z.rad+3,0,6.2832); c.stroke(); }   // driven by a Howler
+  if(S.howl){ const pu=(now/520+z.ph)%1; c.strokeStyle='rgba(197,138,216,'+(.6*(1-pu)).toFixed(2)+')'; c.lineWidth=2; c.beginPath(); c.arc(0,0,z.rad+4+pu*36,0,6.2832); c.stroke(); }
   c.fillStyle='rgba(0,0,0,.28)'; ell(c,2,3,z.rad+1,z.rad-1);
   if(z.chgW>0){   // charge telegraph
     c.save(); c.rotate(z.face); c.fillStyle='rgba(232,70,50,'+(.18+.14*Math.sin(now/40)).toFixed(2)+')'; c.fillRect(z.rad,-z.rad,230,z.rad*2); c.restore();
@@ -4736,7 +4963,7 @@ function drawZombie(z,px,py,now){
     if(z.kind==='alpha'){ c.fillStyle=hit?'#fff':'#2a1c1a'; for(let k=-1;k<=1;k++){ c.beginPath(); c.moveTo(-6,k*5-2.5); c.lineTo(-13,k*5); c.lineTo(-6,k*5+2.5); c.closePath(); c.fill(); } }
     c.fillStyle=shirt;
     if(z.kind==='brute'||z.kind==='alpha') ell(c,-.5,0,7.5,11);
-    else if(z.kind==='bloater'){ ell(c,-1,0,8.5,10); c.fillStyle=hit?'#fff':'rgba(150,180,90,.75)'; ell(c,-1.5,0,6.5,7.5); c.fillStyle='rgba(200,220,120,.7)'; c.beginPath(); c.arc(-3,-3,1.4,0,6.2832); c.arc(-1,4,1.2,0,6.2832); c.arc(2,-1,1,0,6.2832); c.fill(); }
+    else if(z.kind==='bloater'||z.kind==='brood'){ ell(c,-1,0,8.5,10); c.fillStyle=hit?'#fff':'rgba(150,180,90,.75)'; ell(c,-1.5,0,6.5,7.5); c.fillStyle='rgba(200,220,120,.7)'; c.beginPath(); c.arc(-3,-3,1.4,0,6.2832); c.arc(-1,4,1.2,0,6.2832); c.arc(2,-1,1,0,6.2832); c.fill(); }
     else ell(c,z.kind==='runner'?1:0,0,z.kind==='stalker'?5.6:6.4,z.kind==='stalker'?8.6:9.6);
     c.fillStyle='rgba(60,10,10,.35)'; ell(c,-1,2.5,2.6,3.4);                                                  // old blood
     if(S.resist||z.elite==='armored'){ c.fillStyle=hit?'#fff':'#2c3440'; c.fillRect(-4,-7.5,8,15); c.fillStyle='rgba(255,255,255,.12)'; c.fillRect(-4,-7.5,8,2); }
@@ -4749,7 +4976,7 @@ function drawZombie(z,px,py,now){
     else {
       c.fillStyle='#2b241d'; c.beginPath(); c.arc(hx-1,0,5,2.1,4.18); c.fill();
       c.fillStyle='#2a1012';
-      if(S.scream){ c.beginPath(); c.arc(hx+2.6,0,2.6+(z.screamT>0?1.2:0),0,6.2832); c.fill(); }
+      if(S.scream||S.howl){ c.beginPath(); c.arc(hx+2.6,0,2.6+((z.screamT>0||S.howl)?1.2:0),0,6.2832); c.fill(); }
       else c.fillRect(hx+3,-1.4,1.6,2.8);
       if(S.spit){ c.fillStyle=hit?'#fff':'rgba(160,210,70,.85)'; c.beginPath(); c.arc(hx-3.5,0,2.6+.6*Math.sin(now/200+z.ph),0,6.2832); c.fill(); }
     }
@@ -4958,6 +5185,20 @@ function draw(dt){
     cx.restore();
   }
 
+  // the army column, idling at the pile-up
+  if(convoy && onScr(convoy.x,convoy.y,140)){
+    const px=convoy.x+ox, py=convoy.y+oy;
+    for(let k=0;k<2;k++){
+      const bx=px+k*84;
+      cx.fillStyle='rgba(0,0,0,.35)'; cx.fillRect(bx-30,py-14,68,36);
+      cx.fillStyle='#17181a'; for(let j=0;j<3;j++){ cx.fillRect(bx-28+j*22,py-21,14,6); cx.fillRect(bx-28+j*22,py+15,14,6); }
+      cx.fillStyle='#3f4a30'; cx.fillRect(bx-34,py-17,68,34); cx.fillStyle='#566342'; cx.fillRect(bx-32,py-15,64,30);
+      cx.fillStyle='rgba(0,0,0,.2)'; cx.fillRect(bx-32,py-15,64,4);
+      cx.fillStyle='#2e3824'; cx.beginPath(); cx.arc(bx-2,py,10,0,7); cx.fill(); cx.fillRect(bx+4,py-2,26,4);
+      cx.fillStyle='#17181a'; cx.fillRect(bx-24,py-6,10,12);
+      cx.fillStyle='#e6dca0'; cx.fillRect(bx+31,py-13,3,6); cx.fillRect(bx+31,py+7,3,6);
+    }
+  }
   // time-of-day grade, then line-of-sight darkness and light
   const hh=(gameMin/60)%24;
   const warm = hh>17.3&&hh<20.2 ? 1-Math.abs(hh-18.9)/1.5 : hh>5.4&&hh<8 ? 1-Math.abs(hh-6.6)/1.3 : 0;
@@ -5048,7 +5289,7 @@ function syncHUD(){
   let bt='';
   if(story&&story.hold){ const t=Math.max(0,Math.ceil(story.hold.t)); bt=`⚠ ${story.hold.label} — ${Math.floor(t/60)}:${String(t%60).padStart(2,'0')} ⚠`; }
   else if(siegeActive) bt='⚠ UNDER SIEGE ⚠';
-  if(_hc.sb!==bt){ _hc.sb=bt; const sb=$('siegeBanner'); sb.textContent=bt; sb.style.display=bt?'block':'none'; }
+  if(_hc.sb!==bt){ _hc.sb=bt; const sb=$('siegeBanner'); sb.textContent=bt; sb.style.display=bt?'block':'none'; $('hud').classList.toggle('alert',!!bt); }
   setT('dayTxt','Day '+day); setT('timeTxt',clockStr());
   setT('killTxt',kills+' killed'+(weather==='rain'?'  🌧':weather==='storm'?'  ⛈':weather==='fog'?'  🌫':''));
   let st='';
@@ -5201,9 +5442,9 @@ function renderCraft(list){
 function renderJournal(list){
   const st=story, r=st.route;
   list.appendChild(el('div','secHdr',`THE WAY OUT — ${esc(ROUTE_NAME[r].toUpperCase())}`));
-  const steps=[['Search the house',0],[`Reach ${HUB_NAME[r]}`,1],[{signal:'Find fuel and a fuse for the relay',road:'Find a battery, fuel and the keys',line:'Find the three digits of the gate code'}[r],2],
-    [{signal:'Start the generator',road:'Start the truck',line:'Enter the code'}[r],3],['Hold out',4]];
-  if(r==='signal') steps.push(['Light the beacon at the school field',5],['Hold the landing zone',6],['Board the helicopter',7]); else steps.push([r==='road'?'Drive out of Deadfall':'Walk through the gate',5]);
+  const steps=[['Search the house',0],[`Reach ${HUB_NAME[r]}`,1],[{signal:'Find fuel and a fuse for the relay',road:'Find a battery, fuel and the keys',line:'Find the three digits of the gate code',bus:'Find fuel, the keys — and people to take with you',sweep:'Build a signal pyre at the pile-up'}[r],2],
+    [{signal:'Start the generator',road:'Start the truck',line:'Enter the code',bus:'Start the bus',sweep:'Light the pyre at first light on the right day'}[r],3],['Hold out',4]];
+  if(r==='signal') steps.push(['Light the beacon at the school field',5],['Hold the landing zone',6],['Board the helicopter',7]); else steps.push([{road:'Drive out of Deadfall',line:'Walk through the gate',bus:'Drive everyone out',sweep:'Climb aboard the column'}[r],5]);
   for(const [t,n] of steps){ if(n>st.step+1) break; const cur=n===st.step; const o=cur?objective():null;
     list.appendChild(el('div','jline'+(n<st.step?' done':cur?' cur':''),(cur?'◆ ':n<st.step?'✓ ':'· ')+esc(t)+(o&&o.s?`<small>${esc(o.s).replace(/\n/g,'<br>')}</small>`:''))); }
   const keys=ROUTE_KEYS[r].filter(k=>st.have[k]);
@@ -5315,7 +5556,7 @@ function hideOverlays(){
 const miniBuf=document.createElement('canvas'); miniBuf.width=MW; miniBuf.height=MH;
 const mbx=miniBuf.getContext('2d');
 let miniTick=0, mapOpen=false, saveT=25, savedGame=null;
-const POI_ICO={trader:'🚐',survivor:'🧑',holdout:'☠️',fire:'🔥',police:'🚓',hospital:'🏥',supermarket:'🛒',school:'🏫',church:'⛪',firestation:'🚒',garage:'🚚',gas:'⛽',tower:'📡',checkpoint:'🚧',lz:'🚁',park:'🌳',wreck:'💥',airdrop:'📦',stash:'✚',market:'🛒',hardware:'🔧',clinic:'➕',gunshop:'🔫',warehouse:'🏭'};
+const POI_ICO={bus:'🚌',trader:'🚐',survivor:'🧑',holdout:'☠️',fire:'🔥',police:'🚓',hospital:'🏥',supermarket:'🛒',school:'🏫',church:'⛪',firestation:'🚒',garage:'🚚',gas:'⛽',tower:'📡',checkpoint:'🚧',lz:'🚁',park:'🌳',wreck:'💥',airdrop:'📦',stash:'✚',market:'🛒',hardware:'🔧',clinic:'➕',gunshop:'🔫',warehouse:'🏭'};
 function buildMiniBuf(){
   if(!explored) return;
   const img=mbx.createImageData(MW,MH), d=img.data;
@@ -5654,7 +5895,7 @@ function serialize(){
   }
   const found=[]; pois.forEach((p,k)=>{ if(p.found&&!p.dyn) found.push(k); });
   return {
-    v:SCHEMA, seed:SEED, day, gameMin, kills, hordeArmed, hintI, hinted,
+    v:SCHEMA, gen:7, seed:SEED, day, gameMin, kills, hordeArmed, hintI, hinted, raidDay,
     p:{x:P.x,y:P.y,face:P.face,hp:P.hp,sat:P.sat,hyd:P.hyd,sta:P.sta,bleeding:P.bleeding,infected:P.infected,infMsg:P.infMsg,healPool:P.healPool,
        ws:P.ws,wi:P.wi,inv:P.inv,bag:P.bag,armor:P.armor,skills:P.skills,xp:P.xp,lvl:P.lvl,perks:P.perks,origin:P.origin,swDay:P.swDay,
        fracture:P.fracture,fractureT:P.fractureT,contam:P.contam,contamP:P.contamP,contamKind:P.contamKind,flashBatt:P.flashBatt,flashOn:P.flashOn},
@@ -5680,7 +5921,7 @@ function resetRunState(){
   weather='clear'; weatherStrength=0; weatherT=90; lightning=0; curDistrict='';
   chronicle=[]; run={looted:0,crafted:0,boards:0,dmg:0,alpha:0,elites:0};
   power=true; heli=null; boss=null; pendingPerks=0; alphaDay=0; dropDay=0; heliDay=0;
-  npcs=[]; herd=null; blaze=null; _stock=null; herdDay=0; fireDay=0; flareDay=0; talkOpen=false; tradeOpen=false;
+  npcs=[]; herd=null; blaze=null; _stock=null; herdDay=0; fireDay=0; flareDay=0; raidDay=0; convoy=null; talkOpen=false; tradeOpen=false;
   evtHours={herd:8+Math.random()*10,fire:9+Math.random()*12,flare:10+Math.random()*4};
   hinted={}; hintI=0; hintT=1.2; spawnT=14; hordeArmed=true; beatT=0; groanT=6;
   waypoint=null; miniDirty=true; flowDirty=true; flowT=0; flowPI=-1; flow.fill(65535);
@@ -5698,6 +5939,7 @@ function newRun(originId){
   const hadFurniture=assignStarterLoot(originId);
   buildStory();
   genTown();                          // people, on their own random stream
+  genRoutes(true);                    // and perhaps one of the newer ways out, on a third
   const sb=buildings[startHouseIdx], sp=safeSpawnInHouse(sb), O=ORIGINS[originId]||ORIGINS.drifter;
   P=freshPlayer(sp.x,sp.y); P.origin=originId;
   for(const k in O.perks) P.perks[k]=O.perks[k];
@@ -5708,6 +5950,8 @@ function newRun(originId){
   explored=new Uint8Array(MW*MH);
   if(mod('dark')) power=false;
   if(originId==='dispatcher') for(const n of npcs){ n.poi.found=true; n.poi.hidden=false; }          // you know where they went to ground
+  if(originId==='driver'){ const bp=pois.find(p=>p.t==='bus'); if(bp) bp.found=true; for(const p of pois) if(p.t==='school'||p.t==='gas') p.found=true; }
+  if(originId==='sentry'){ const wp=pois.find(p=>p.t==='wreck'); if(wp) wp.found=true; }
   if(originId==='smuggler'){ story.credit=40; const tp=pois.find(p=>p.t==='trader'); if(tp) tp.found=true; }
   if(!hadFurniture){ for(const id of O.kit) addItem(id); story.notes.push('start'); story.step=1; }   // never wake truly empty-handed
   chron(`Woke in a house in ${DISTRICT_NAME[districtAt(sb.x+1,sb.y+1)]}. ${O.n}.`);
@@ -5720,7 +5964,7 @@ function applySave(s){
   day=s.day||1; gameMin=(s.gameMin!=null?s.gameMin:480); kills=s.kills||0;
   const origin=(s.p&&s.p.origin&&ORIGINS[s.p.origin])?s.p.origin:'drifter';
   curRng=mulberry32(SEED);            // rebuild the exact town and story from the seed
-  genMap(); pickStartHouse(); assignStarterLoot(origin); buildStory(); genTown();
+  genMap(); pickStartHouse(); assignStarterLoot(origin); buildStory(); genTown(); genRoutes(s.gen>=7);
   curRng=Math.random;
   doorOpen=new Set(s.doorsOpen||[]);
   doorHp=new Map(s.doorHp||[]);
@@ -5739,7 +5983,8 @@ function applySave(s){
   (s.npcs||[]).forEach((d,k)=>{ const n=npcs[k]; if(!n) return; n.state=d.s||'wait'; n.x=d.x; n.y=d.y; n.lx=d.x; n.ly=d.y; n.hp=d.hp; n.met=!!d.met; n.needDone=!!d.nd; n.used=d.u||0; n.flared=!!d.fl; n.settled=!!d.st; n.called=!!d.c;
     n.poi.x=n.x/TS; n.poi.y=n.y/TS; if(n.met||n.flared){ n.poi.hidden=false; } if(n.state==='dead') n.poi.n=n.name+' (dead)'; });
   if(story.cleared){ const hp=pois.find(p=>p.t==='holdout'); if(hp){ hp.n='Holdout (cleared)'; hp.hidden=false; } }
-  herdDay=s.herdDay||0; fireDay=s.fireDay||0; flareDay=s.flareDay||0;
+  herdDay=s.herdDay||0; fireDay=s.fireDay||0; flareDay=s.flareDay||0; raidDay=s.raidDay||0;
+  if(story.route==='sweep'&&story.step===5&&story.pyre!=null) convoy={x:((story.pyre%MW)+.5)*TS+46,y:(((story.pyre/MW)|0)+.5)*TS,t:9};
   for(const c of conts.values()){ if(c.key&&story.have[c.key]) c.key=null; if(c.note&&story.notes.includes(c.note)) c.note=null; }
   for(const k of (s.pois||[])) if(pois[k]) pois[k].found=true;
   for(const p of (s.dynPois||[])) if(conts.has(p.i)&&!conts.get(p.i).looted) pois.push(p);
